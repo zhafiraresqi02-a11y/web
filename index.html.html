@@ -1,0 +1,3044 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Group</title>
+<style>
+:root{
+  --bg:#f4f6fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+  --primary:#4f46e5; --primary-d:#4338ca; --ok:#16a34a; --izin:#2563eb; --sakit:#d97706; --alpa:#dc2626;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text)}
+.hidden{display:none!important}
+.muted{color:var(--muted)} .tiny{font-size:.78rem} .center{text-align:center}
+h1,h2,h3{margin:0}
+h3{font-size:1.02rem}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;
+  background:linear-gradient(135deg,#4f46e5,#9333ea)}
+.login-card{background:#fff;border-radius:20px;padding:28px;width:100%;max-width:380px;text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:12px}
+.logo{font-size:3rem}
+.role-pick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.role input{display:none}
+.role span{display:flex;flex-direction:column;gap:2px;padding:14px 8px;border:2px solid var(--line);
+  border-radius:12px;cursor:pointer}
+.role small{color:var(--muted);font-size:.72rem}
+.role input:checked + span{border-color:var(--primary);background:#eef2ff}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:14px 18px;
+  display:flex;justify-content:space-between;align-items:center}
+.topbar small{opacity:.85}
+#app{max-width:860px;margin:0 auto;padding-bottom:40px}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin:14px;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:12px}
+
+/* konteks */
+.context{flex-direction:row;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-top:-1px}
+.save-state{font-size:.8rem;color:var(--muted);margin-left:auto;font-weight:600}
+.save-state.ok{color:var(--ok)} .save-state.warn{color:var(--sakit)} .save-state.err{color:var(--alpa)}
+
+/* form */
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.78rem;color:var(--muted);font-weight:600}
+.grow{flex:1;min-width:140px}
+input[type=text],input[type=date],input[type=number],input[type=password],input[type=time],select,textarea{
+  padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:#fff;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+textarea{resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem}
+.check{display:flex;align-items:center;gap:6px;font-size:.9rem;align-self:flex-end;padding-bottom:10px}
+details{border:1px dashed var(--line);border-radius:10px;padding:10px}
+details summary{cursor:pointer;color:var(--primary);font-weight:600}
+details textarea{margin:10px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* layout util */
+.row{display:flex;align-items:center}
+.between{justify-content:space-between}
+.gap{gap:8px}
+.wrap{flex-wrap:wrap}
+
+/* buttons */
+.btn{border:1.5px solid var(--line);background:#fff;padding:10px 16px;border-radius:10px;font:inherit;
+  font-weight:600;cursor:pointer}
+.btn:hover{background:#f3f4f6}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.primary:hover{background:var(--primary-d)}
+.btn.danger{color:var(--alpa);border-color:#fecaca}
+.btn.danger:hover{background:#fef2f2}
+.btn.ghost{background:transparent;color:inherit}
+.topbar .btn.ghost{border-color:rgba(255,255,255,.5);color:#fff}
+.btn.small{padding:6px 12px;font-size:.85rem}
+.btn.block{width:100%} .btn.big{padding:14px;font-size:1.1rem}
+
+/* tabs */
+.tabs{display:flex;gap:6px;padding:0 14px;overflow-x:auto}
+.tab{flex:1 0 auto;white-space:nowrap;border:none;background:#e9ecf8;padding:11px 14px;border-radius:12px;
+  font:inherit;font-weight:600;cursor:pointer;color:#4b5563}
+.tab.active{background:var(--primary);color:#fff}
+.subtabs{display:flex;gap:6px}
+.subtab{flex:1;border:1.5px solid var(--line);background:#fff;padding:9px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+.subtab.active{background:#eef2ff;border-color:var(--primary);color:var(--primary)}
+
+/* list */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.item .nm{font-weight:600} .item .nim{font-size:.78rem;color:var(--muted)}
+.badge{background:#eef2ff;color:var(--primary);padding:2px 9px;border-radius:99px;font-size:.8rem}
+.empty{text-align:center;color:var(--muted);padding:18px}
+
+/* status buttons */
+.st{display:flex;gap:4px}
+.st button{border:1.5px solid var(--line);background:#fff;border-radius:8px;width:38px;height:34px;
+  font-weight:700;cursor:pointer;color:var(--muted);touch-action:manipulation;user-select:none}
+.st button.on[data-s=H]{background:var(--ok);border-color:var(--ok);color:#fff}
+.st button.on[data-s=I]{background:var(--izin);border-color:var(--izin);color:#fff}
+.st button.on[data-s=S]{background:var(--sakit);border-color:var(--sakit);color:#fff}
+.st button.on[data-s=A]{background:var(--alpa);border-color:var(--alpa);color:#fff}
+.counter{display:flex;gap:8px;flex-wrap:wrap;font-size:.82rem}
+.counter span{padding:3px 10px;border-radius:99px;background:#f3f4f6}
+
+/* roda spin */
+.wheel-wrap{position:relative;width:min(100%,340px);margin:6px auto 0}
+#wheel{width:100%;aspect-ratio:1;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.18))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;
+  border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid #111827;
+  z-index:2;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+.spin-box{min-height:70px;display:grid;place-items:center;border-radius:14px;font-size:1.35rem;font-weight:800;
+  background:linear-gradient(135deg,#eef2ff,#fdf2f8);border:2px dashed #c7d2fe;text-align:center;padding:8px}
+.spin-box.spinning{animation:pulse .3s infinite alternate;color:var(--primary)}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.03)}}
+.spin-log{margin:0;padding-left:22px;font-size:.92rem;line-height:1.6}
+
+/* groups */
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.gcard{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;
+  animation:pop .35s ease both}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+.gcard input{font-weight:700}
+.gcard input.materi{font-weight:400;font-size:.88rem}
+.gcard ol{margin:0;padding-left:20px;font-size:.9rem;line-height:1.55}
+.ghead{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--muted)}
+.mrow{display:flex;align-items:center;gap:6px;justify-content:space-between;font-size:.9rem;padding:2px 0}
+.mrow .mname{flex:1;min-width:0;word-break:break-word}
+.mrow select{width:auto;padding:3px 4px;font-size:.78rem}
+.xbtn{border:none;background:#fee2e2;color:#991b1b;border-radius:99px;width:22px;height:22px;cursor:pointer;font-weight:700;line-height:1;flex:none}
+.gcard .addrow,.sgrp .addrow{display:flex;gap:6px}
+.gcard .addrow input,.sgrp .addrow input{padding:7px 10px;font-size:.85rem;font-weight:400}
+.gcard.flash{animation:flashcard 1.4s ease}
+@keyframes flashcard{0%{box-shadow:0 0 0 0 rgba(79,70,229,.6);background:#eef2ff;transform:scale(1.04)}100%{box-shadow:0 0 0 14px rgba(79,70,229,0);background:#fff;transform:none}}
+
+/* kelompok tersimpan */
+.setbox{border:1.5px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fafbff}
+.set-mk-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#eef2ff;padding:8px 10px;border-radius:10px;border:1px solid #c7d2fe}
+.set-mk-bar label{font-size:.78rem;font-weight:700;color:var(--primary);white-space:nowrap}
+.set-mk-bar input{padding:6px 10px;font-size:.88rem;font-weight:600;flex:1;min-width:160px}
+.sgrp{display:flex;flex-direction:column;gap:8px;margin:8px 0 4px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:10px}
+.sgrp-head{display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center}
+.sgrp .smembers{font-size:.86rem;color:var(--text);line-height:1.5;display:flex;flex-direction:column;gap:3px}
+.sgrp input{font-size:.88rem;padding:7px 10px}
+
+/* tampilan grid kelompok lengkap (riwayat & mahasiswa) */
+.mhs-grp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:4px}
+.mhs-grp-box{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+.mhs-grp-box h5{margin:0 0 4px;font-size:.95rem;color:var(--primary)}
+.mhs-grp-box .materi-tag{font-size:.8rem;color:var(--muted);margin-bottom:6px;font-style:italic}
+.mhs-grp-box ol{margin:0;padding-left:18px;font-size:.88rem;line-height:1.55}
+
+/* editor inline di tab riwayat */
+.hist-edit-panel{margin-top:8px;padding:12px;border-radius:12px;border:1.5px dashed #b88b49;background:#fffdf8;display:flex;flex-direction:column;gap:10px}
+.hist-edit-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;background:#fff;border:1px solid var(--line);border-radius:9px;flex-wrap:wrap}
+
+/* sumber nama spin */
+.source-box{border:1.5px dashed #c7d2fe;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:#fafbff}
+.source-box .check{align-self:flex-start;padding-bottom:0}
+.check.sub{margin-left:24px}
+.pool-info{font-size:.85rem;color:var(--primary);font-weight:700}
+
+/* jadwal */
+.day-block{display:flex;flex-direction:column;gap:8px}
+.day-h{font-weight:800;color:var(--primary);margin-top:6px}
+.day-h.today{background:#eef2ff;border-radius:8px;padding:4px 10px}
+
+/* tugas */
+.tcard{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:opacity .2s,border-color .2s,background .2s}
+.tcard.done{opacity:.72;background:#f8fafc}
+.tcard.mhs-checked{border-color:#86efac;background:#f0fdf4}
+.tcard.mhs-checked h4{text-decoration:line-through;color:var(--muted)}
+.tcard h4{margin:0;font-size:1rem}
+.mhs-check-wrap{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:10px;border:1.5px solid #dbe4ee;background:#f8fbff;cursor:pointer;font-size:.9rem;font-weight:650;color:#1e3a5f;user-select:none;width:fit-content}
+.mhs-check-wrap:hover{background:#eef6ff;border-color:#93c5fd}
+.mhs-check-wrap input[type=checkbox]{width:18px;height:18px;accent-color:var(--ok);cursor:pointer;margin:0}
+.mhs-check-wrap.checked{background:#dcfce7;border-color:#86efac;color:#166534}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.75rem;font-weight:700;background:#eef2ff;color:var(--primary)}
+.chip.warn{background:#fef3c7;color:#92400e}
+.chip.late{background:#fee2e2;color:#991b1b}
+.chip.ok{background:#dcfce7;color:#166534}
+.tdesc{white-space:pre-wrap;font-size:.92rem;line-height:1.5}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.media-grid img,.media-grid video{width:100%;height:130px;object-fit:cover;border-radius:10px;background:#111;cursor:zoom-in}
+.media-grid video{cursor:auto}
+.pending{display:flex;flex-wrap:wrap;gap:8px}
+.pfile{position:relative;width:96px;height:96px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#f3f4f6;display:grid;place-items:center;font-size:.7rem;text-align:center}
+.pfile img,.pfile video{width:100%;height:100%;object-fit:cover}
+.pfile button{position:absolute;top:2px;right:2px;border:none;background:rgba(0,0,0,.65);color:#fff;border-radius:99px;width:22px;height:22px;cursor:pointer}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:grid;place-items:center;z-index:200;padding:16px;cursor:zoom-out}
+#lightbox img{max-width:100%;max-height:100%;border-radius:8px}
+
+/* riwayat absen ringkasan */
+.hist-card{border:1.5px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fff}
+.hist-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.hist-stat{border-radius:10px;padding:8px 10px;font-size:.84rem;border:1px solid var(--line);background:#f9fafb}
+.hist-stat b{display:block;margin-bottom:4px;font-size:.85rem}
+.hist-stat.h{border-left:4px solid var(--ok)}
+.hist-stat.i{border-left:4px solid var(--izin)}
+.hist-stat.s{border-left:4px solid var(--sakit)}
+.hist-stat.a{border-left:4px solid var(--alpa)}
+.hist-names{margin:0;padding-left:16px;line-height:1.45;color:var(--text)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#111827;color:#fff;
+  padding:10px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:.25s;font-size:.9rem;z-index:99}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* ===== ANIMASI TOMBOL (HANYA YANG DIPENCET) ===== */
+.btn,.tab,.subtab,.st button,.role span{transition:transform .16s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background .2s,color .2s,border-color .2s}
+.btn:hover,.tab:hover,.subtab:hover,.st button:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(79,70,229,.25)}
+.btn:active,.tab:active,.subtab:active,.st button:active,.role span:active{transform:scale(.9);box-shadow:none}
+.role span:hover{transform:translateY(-3px);border-color:#a5b4fc}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+.st button.pop-click{animation:bounceSingle .32s ease}
+@keyframes bounceSingle{0%{transform:scale(.75)}55%{transform:scale(1.22)}100%{transform:scale(1)}}
+#btnSpin:not(:disabled){animation:glow 1.8s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(79,70,229,.45)}50%{box-shadow:0 0 0 10px rgba(79,70,229,0)}}
+.tabpane{animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.login-card{animation:rise .5s ease}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.login-err,.form-err{color:var(--alpa);font-size:.85rem;margin:0;min-height:1em}
+.form-ok{color:var(--ok);font-size:.85rem;margin:0}
+
+/* role Mahasiswa: hanya lihat, cari/filter tugas, dan centang tugas pribadi */
+body.role-mhs .only-sek,
+body.role-mhs .only-edit,
+body.role-mhs .tab[data-tab=mhs],
+body.role-mhs .tab[data-tab=set]{display:none!important}
+body:not(.role-mhs) .only-mhs{display:none!important}
+body.role-mhs .st button{pointer-events:none}
+body.role-mhs .st button:not(.on){display:none}
+body.role-mhs input:not(.mhs-tugas-chk):not(#tSearch):not(#tHideDone):not(.hist-search):not(#loginName),
+body.role-mhs textarea:not(#rekap),
+body.role-mhs select:not(#filterSetMatkul):not(#tFilter){
+  pointer-events:none;
+  background:#f8fafc;
+  color:#475569;
+}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media(max-width:600px){
+  html,body{width:100%;overflow-x:hidden}
+  #app{width:100%;max-width:100%;padding-bottom:24px}
+  .topbar{padding:12px 14px;gap:10px}
+  .topbar h2{font-size:1.15rem}
+  .topbar .row{gap:6px}
+  .topbar .btn{padding:7px 9px;font-size:.78rem}
+
+  .tabs{
+    padding:0 10px 5px;
+    gap:7px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;padding:10px 13px;font-size:.9rem}
+
+  .card{margin:9px;padding:13px;border-radius:13px;gap:11px}
+  .context{flex-direction:column;align-items:stretch}
+  .context .field,.context .grow{width:100%;min-width:0}
+  .save-state{margin-left:0}
+
+  #absenList .item{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+    gap:10px;
+    padding:12px;
+  }
+  #absenList .item > div:first-child{width:100%;min-width:0}
+  #absenList .item .nm{display:block;line-height:1.4;overflow-wrap:anywhere}
+  #absenList .st{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;width:100%}
+  #absenList .st button{width:100%;height:42px;font-size:.95rem}
+
+  .row.between{align-items:flex-start}
+  #tab-absen .card > .row.between{flex-direction:column;align-items:stretch}
+  #tab-absen .card > .row.between > .row{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  #btnSaveAbsen{grid-column:1/-1}
+  .btn{max-width:100%;white-space:normal}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .subtabs{overflow-x:auto}
+  .subtab{flex:1 0 auto}
+  .groups,.mhs-grp-grid{grid-template-columns:1fr}
+  .sgrp-head{grid-template-columns:1fr}
+  .set-mk-bar{align-items:stretch}
+  .set-mk-bar input{min-width:0;width:100%}
+  .gcard .addrow,.sgrp .addrow{flex-wrap:wrap}
+  .gcard .addrow input,.sgrp .addrow input{min-width:0;flex:1}
+  .wheel-wrap{width:min(100%,300px)}
+  textarea{max-width:100%}
+  input,select,textarea{min-width:0}
+  .mhs-check-wrap{width:100%;justify-content:center}
+}
+
+@media(max-width:380px){
+  .topbar{padding:10px}
+  .topbar h2{font-size:1rem}
+  .topbar .btn{font-size:.72rem;padding:6px 7px}
+  .tab{font-size:.83rem;padding:9px 11px}
+  .card{margin:7px;padding:11px}
+}
+
+/* =========================================================
+   STUDY GROUP ACADEMIC UI
+   Blue technology theme: navy, electric blue, cyan
+   ========================================================= */
+:root{
+  --bg:#f2f7fc;
+  --card:#ffffff;
+  --text:#14263d;
+  --muted:#667b91;
+  --line:#dce7f1;
+  --primary:#1769d2;
+  --primary-d:#0e4fa8;
+  --ok:#15966b;
+  --izin:#2478d4;
+  --sakit:#d58a20;
+  --alpa:#d64b5b;
+  --radius:18px;
+  --navy:#0b1f3a;
+  --blue:#1769d2;
+  --cyan:#20c4df;
+}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(32,196,223,.10),transparent 32rem),
+    radial-gradient(ellipse at 95% 12%,rgba(23,105,210,.09),transparent 34rem),
+    var(--bg);
+  color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  letter-spacing:.005em;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  opacity:.22;
+  background-image:linear-gradient(rgba(23,105,210,.045) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(23,105,210,.045) 1px,transparent 1px);
+  background-size:34px 34px;
+}
+#app{max-width:1180px;padding-bottom:48px}
+.topbar{
+  position:relative;
+  overflow:hidden;
+  padding:22px clamp(16px,3vw,32px);
+  background:linear-gradient(118deg,#081a33 0%,#103d78 52%,#147bd1 100%);
+  box-shadow:0 12px 32px rgba(8,38,77,.20);
+  border-bottom:1px solid rgba(255,255,255,.18);
+}
+.topbar:after{
+  content:"";
+  position:absolute;
+  width:270px;height:270px;
+  right:10%;top:-190px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:50%;
+  box-shadow:0 0 0 28px rgba(255,255,255,.035),0 0 0 58px rgba(255,255,255,.025);
+  pointer-events:none;
+}
+.topbar h2{font-size:1.45rem;letter-spacing:.07em;font-weight:850}
+.topbar small{color:#d7eaff}
+.topbar .btn.ghost{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.28);
+  color:#fff;
+  backdrop-filter:blur(8px);
+}
+.topbar .btn.ghost:hover{background:rgba(255,255,255,.2)}
+.card{
+  border:1px solid rgba(204,220,237,.85);
+  border-radius:18px;
+  box-shadow:0 7px 24px rgba(25,67,112,.055),0 1px 3px rgba(25,67,112,.04);
+  padding:clamp(14px,2vw,21px);
+}
+.card h3{font-size:1.08rem;font-weight:800;letter-spacing:-.02em;color:#17395f}
+.context.card{
+  background:linear-gradient(120deg,#fff 0%,#f6fbff 100%);
+  border-color:#d6e8f7;
+}
+.field label{color:#526b85;font-weight:750;letter-spacing:.025em}
+input[type=text],input[type=date],input[type=number],input[type=password],input[type=time],select,textarea{
+  border:1.5px solid #d7e3ef;
+  border-radius:11px;
+  color:#19324e;
+  background:#fbfdff;
+  transition:border-color .18s,box-shadow .18s,background .18s;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:#2385e8;
+  background:#fff;
+  box-shadow:0 0 0 4px rgba(35,133,232,.12);
+}
+.btn{
+  border:1px solid #d8e4ef;
+  border-radius:11px;
+  color:#25415f;
+  background:#fff;
+  box-shadow:0 2px 5px rgba(18,57,99,.035);
+}
+.btn:hover{background:#f2f8ff}
+.btn.primary{
+  color:#fff;
+  border:1px solid transparent;
+  background:linear-gradient(115deg,#1557bd 0%,#167ee0 58%,#16a9d0 100%);
+  box-shadow:0 6px 15px rgba(23,105,210,.22);
+}
+.btn.primary:hover{
+  background:linear-gradient(115deg,#104da9 0%,#126dca 58%,#0d91b8 100%);
+  box-shadow:0 8px 19px rgba(23,105,210,.28);
+}
+.btn.danger{color:#c53e50;border-color:#f3cbd1}
+.tabs{
+  position:sticky;
+  top:0;
+  z-index:20;
+  margin:0 14px;
+  padding:10px;
+  gap:8px;
+  border:1px solid rgba(213,227,241,.9);
+  border-top:0;
+  border-radius:0 0 17px 17px;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 8px 20px rgba(20,59,100,.07);
+  backdrop-filter:blur(14px);
+}
+.tab{
+  border:1px solid transparent;
+  border-radius:11px;
+  padding:11px 15px;
+  color:#49627d;
+  background:transparent;
+}
+.tab:hover{background:#edf6ff;color:#1557a4}
+.tab.active{
+  color:#fff;
+  background:linear-gradient(115deg,#174fae,#167bd6 65%,#16a9c8);
+  box-shadow:0 5px 13px rgba(23,105,210,.22);
+}
+.subtab{border-color:#d9e5f0;color:#48617a}
+.subtab.active{background:#eaf4ff;border-color:#8fc5f2;color:#145eae}
+.item{
+  border:1px solid #dce7f1;
+  border-radius:13px;
+  background:linear-gradient(110deg,#fff,#fbfdff);
+}
+.badge,.chip{
+  background:#eaf4ff;
+  color:#155da9;
+}
+.counter span{
+  background:#edf4fa;
+  color:#36516d;
+  border:1px solid #e0eaf3;
+}
+.st button{
+  border-color:#d9e5f0;
+  background:#fff;
+  color:#61768d;
+  border-radius:9px;
+}
+.st button.on[data-s=H]{background:#15966b;border-color:#15966b}
+.st button.on[data-s=I]{background:#2478d4;border-color:#2478d4}
+.st button.on[data-s=S]{background:#d58a20;border-color:#d58a20}
+.st button.on[data-s=A]{background:#d64b5b;border-color:#d64b5b}
+.spin-box{
+  color:#174b82;
+  background:linear-gradient(125deg,#e8f4ff,#e7fbff);
+  border:1.5px dashed #86c8ed;
+}
+.setbox,.source-box{
+  background:linear-gradient(125deg,#f8fbff,#f0f8ff);
+  border-color:#c9def1;
+}
+.set-mk-bar{
+  background:linear-gradient(110deg,#eaf4ff,#e8faff);
+  border-color:#c6e1f5;
+}
+.day-h{color:#155da9}
+.day-h.today{
+  color:#0e5e9e;
+  background:linear-gradient(90deg,#e2f2ff,#effbff);
+}
+.gcard,.mhs-grp-box,.tcard,.hist-card{
+  border-color:#d9e6f1;
+  border-radius:14px;
+  box-shadow:0 3px 12px rgba(20,67,112,.035);
+}
+.gcard{background:linear-gradient(145deg,#fff,#fafdff)}
+.mhs-grp-box{background:#fff}
+.mhs-grp-box h5{color:#155da9}
+.hist-stat{background:#f7fafd;border-color:#e0eaf3}
+.login-wrap{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 15% 20%,rgba(38,205,231,.30),transparent 26%),
+    radial-gradient(circle at 85% 85%,rgba(77,151,255,.25),transparent 28%),
+    linear-gradient(135deg,#071a33 0%,#10427d 52%,#087eae 100%);
+}
+.login-wrap:before,.login-wrap:after{
+  content:"";
+  position:absolute;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:50%;
+  width:420px;height:420px;
+  pointer-events:none;
+}
+.login-wrap:before{top:-250px;right:-110px;box-shadow:0 0 0 35px rgba(255,255,255,.025),0 0 0 75px rgba(255,255,255,.02)}
+.login-wrap:after{bottom:-330px;left:-130px;width:520px;height:520px}
+.login-card{
+  position:relative;
+  z-index:1;
+  border:1px solid rgba(255,255,255,.75);
+  border-radius:23px;
+  box-shadow:0 25px 70px rgba(0,12,35,.34);
+}
+.login-card h1{color:#102e50;letter-spacing:.09em;font-weight:900}
+.login-card .logo{filter:drop-shadow(0 5px 8px rgba(18,91,164,.18))}
+.role span{background:#fbfdff;border-color:#dce7f1}
+.role input:checked + span{
+  border-color:#2385df;
+  background:linear-gradient(135deg,#eaf4ff,#e8fbff);
+  box-shadow:0 0 0 3px rgba(35,133,223,.10);
+}
+#btnLogin{font-weight:800;letter-spacing:.02em}
+.toast{background:#102b49;box-shadow:0 8px 25px rgba(5,25,48,.25)}
+.btn:hover,.tab:hover,.subtab:hover,.st button:hover{box-shadow:0 6px 14px rgba(23,105,210,.15)}
+#btnSpin:not(:disabled){animation:glowBlue 1.8s infinite}
+@keyframes glowBlue{
+  0%,100%{box-shadow:0 0 0 0 rgba(32,169,220,.32)}
+  50%{box-shadow:0 0 0 10px rgba(32,169,220,0)}
+}
+@media(min-width:900px){
+  .topbar{border-radius:0 0 20px 20px}
+  .tabs{margin-top:12px;border:1px solid rgba(213,227,241,.9);border-radius:16px}
+}
+@media(max-width:600px){
+  .topbar{border-radius:0 0 16px 16px}
+  .tabs{margin:0 9px;padding:8px;border-radius:0 0 14px 14px}
+  .card{box-shadow:0 4px 16px rgba(25,67,112,.055)}
+  .tab{border-radius:10px}
+}
+
+/* =========================================================
+   STUDY GROUP BLUE x WARM GOLD EDITION
+   ========================================================= */
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --text:#182b40;
+  --muted:#718096;
+  --line:#e4e8ee;
+  --primary:#245b91;
+  --primary-d:#193f68;
+  --ok:#168568;
+  --izin:#2878bd;
+  --sakit:#c58a35;
+  --alpa:#c94d59;
+  --navy:#102b46;
+  --blue:#245b91;
+  --cyan:#6ca6c8;
+  --gold:#c69a52;
+  --gold-light:#f4e7cf;
+  --gold-dark:#8b672f;
+}
+body{
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(198,154,82,.10),transparent 31rem),
+    radial-gradient(ellipse at 95% 10%,rgba(36,91,145,.10),transparent 34rem),
+    var(--bg);
+  color:var(--text);
+}
+body:before{
+  background-image:linear-gradient(rgba(36,91,145,.035) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(198,154,82,.035) 1px,transparent 1px);
+}
+.topbar{
+  background:linear-gradient(118deg,#102b46 0%,#1c4d78 55%,#b18445 145%);
+  box-shadow:0 12px 32px rgba(16,43,70,.18);
+}
+.topbar:after{
+  border-color:rgba(244,231,207,.24);
+  box-shadow:0 0 0 28px rgba(244,231,207,.045),0 0 0 58px rgba(244,231,207,.025);
+}
+.topbar .btn.ghost{
+  background:rgba(255,255,255,.10);
+  border-color:rgba(244,231,207,.42);
+}
+.card{
+  border-color:#e5e8ec;
+  box-shadow:0 7px 24px rgba(28,55,82,.055),0 1px 3px rgba(28,55,82,.035);
+}
+.card h3{color:#1b3e5d}
+.context.card{
+  background:linear-gradient(120deg,#fff 0%,#fcfaf6 100%);
+  border-color:#e9dfcf;
+}
+input[type=text],input[type=date],input[type=number],input[type=password],input[type=time],select,textarea{
+  border-color:#dfe5eb;
+  background:#fffdfa;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#b88b49;
+  box-shadow:0 0 0 4px rgba(198,154,82,.14);
+}
+.btn{border-color:#e1e5e9;color:#304a63}
+.btn:hover{background:#faf7f1}
+.btn.primary{
+  background:linear-gradient(115deg,#1b4c79 0%,#286b9e 62%,#b88b49 155%);
+  box-shadow:0 6px 15px rgba(36,91,145,.19);
+}
+.btn.primary:hover{
+  background:linear-gradient(115deg,#153d63 0%,#235c8b 62%,#a77938 155%);
+  box-shadow:0 8px 19px rgba(36,91,145,.24);
+}
+.tabs{
+  border-color:#e5e8ec;
+  background:rgba(255,255,255,.91);
+}
+.tab{color:#52677b}
+.tab:hover{background:#f7f2e9;color:#805e2e}
+.tab.active{
+  background:linear-gradient(115deg,#1b4c79 0%,#286b9e 68%,#b88b49 160%);
+  box-shadow:0 5px 13px rgba(36,91,145,.19);
+}
+.subtab.active{
+  background:#f7f0e4;
+  border-color:#d9bd91;
+  color:#805e2e;
+}
+.badge,.chip{background:#f5ecdd;color:#87632e}
+.counter span{background:#f5f6f7;color:#43576b;border-color:#e7e9ec}
+.st button{border-color:#e0e5e9;color:#68788a}
+.st button.on[data-s=H]{background:#168568;border-color:#168568}
+.st button.on[data-s=I]{background:#2878bd;border-color:#2878bd}
+.st button.on[data-s=S]{background:#c58a35;border-color:#c58a35}
+.st button.on[data-s=A]{background:#c94d59;border-color:#c94d59}
+.spin-box{
+  color:#244d70;
+  background:linear-gradient(125deg,#edf4f9 0%,#f7efdf 100%);
+  border-color:#d8bd91;
+}
+.setbox,.source-box{
+  background:linear-gradient(125deg,#fbfcfd,#faf6ef);
+  border-color:#e5d7c1;
+}
+.set-mk-bar{
+  background:linear-gradient(110deg,#edf4f9,#f7efdf);
+  border-color:#e2cfad;
+}
+.day-h{color:#245b91}
+.day-h.today{
+  color:#805e2e;
+  background:linear-gradient(90deg,#edf4f9,#f7efdf);
+}
+.gcard,.mhs-grp-box,.tcard,.hist-card{border-color:#e4e7eb}
+.mhs-grp-box h5{color:#245b91}
+.hist-stat{background:#fafbfc;border-color:#e6e9ed}
+.hist-stat.s{border-left-color:#c58a35}
+.login-wrap{
+  background:
+    radial-gradient(circle at 15% 20%,rgba(198,154,82,.28),transparent 26%),
+    radial-gradient(circle at 85% 85%,rgba(108,166,200,.22),transparent 28%),
+    linear-gradient(135deg,#0b2036 0%,#1b4c79 57%,#8b672f 145%);
+}
+.login-wrap:before,.login-wrap:after{border-color:rgba(244,231,207,.16)}
+.login-card{border-color:rgba(244,231,207,.75)}
+.login-card h1{color:#183b5a}
+.role span{border-color:#e4e7eb}
+.role input:checked + span{
+  border-color:#bd914f;
+  background:linear-gradient(135deg,#edf4f9,#f8f0e2);
+  box-shadow:0 0 0 3px rgba(198,154,82,.10);
+}
+#btnSpin:not(:disabled){animation:glowBlueGold 1.8s infinite}
+@keyframes glowBlueGold{
+  0%,100%{box-shadow:0 0 0 0 rgba(198,154,82,.32)}
+  50%{box-shadow:0 0 0 10px rgba(198,154,82,0)}
+}
+.btn:hover,.tab:hover,.subtab:hover,.st button:hover{
+  box-shadow:0 6px 14px rgba(36,91,145,.12);
+}
+@media(max-width:600px){
+  .topbar{background:linear-gradient(135deg,#102b46 0%,#1d527f 68%,#9a7541 150%)}
+}
+
+/* =========================================================
+   STUDY GROUP — DARK CINEMATIC / CRIMSON EDITION
+   Visual refresh only. Existing app behavior is preserved.
+   ========================================================= */
+:root{
+  color-scheme:dark;
+  --bg:#09090c;
+  --card:#15151b;
+  --text:#f4f2f2;
+  --muted:#aaa5a8;
+  --line:#383037;
+  --primary:#e50925;
+  --primary-d:#b9061b;
+  --ok:#15966b;
+  --izin:#397fc4;
+  --sakit:#c58a35;
+  --alpa:#e33c50;
+  --navy:#101014;
+  --blue:#34343c;
+  --cyan:#a7a1a4;
+  --gold:#bd8b57;
+  --gold-light:#e8d6c5;
+  --gold-dark:#6f4634;
+}
+html{background:#09090c}
+body{
+  background:
+    radial-gradient(ellipse at 82% 0%,rgba(124,24,35,.19),transparent 34rem),
+    radial-gradient(ellipse at 5% 35%,rgba(105,19,29,.10),transparent 30rem),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 4px),
+    #09090c;
+  color:var(--text);
+}
+body:before{
+  background-image:linear-gradient(rgba(229,9,37,.035) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(229,9,37,.025) 1px,transparent 1px);
+  opacity:.28;
+}
+#app{max-width:1120px;padding-bottom:56px}
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:linear-gradient(110deg,#08080a 0%,#171116 58%,#310d15 130%);
+  border-bottom:1px solid rgba(229,9,37,.38);
+  box-shadow:0 12px 35px rgba(0,0,0,.42);
+  padding:17px clamp(16px,3vw,34px);
+}
+.topbar h2{display:flex;align-items:center;gap:12px}
+.brand-title{font-size:1.18rem;letter-spacing:.11em;font-weight:900}
+.brand-title span:last-child{font-style:italic}
+.brand-title b{color:#f04454}
+.brand-mark,.logo-mark{
+  display:grid;place-items:center;
+  color:#fff;font-weight:1000;font-style:italic;letter-spacing:-.12em;
+  background:linear-gradient(145deg,#fa3449,#a50019);
+  clip-path:polygon(25% 0,100% 0,76% 35%,100% 35%,24% 100%,43% 57%,0 57%);
+  text-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+.brand-mark{width:34px;height:34px;font-size:.72rem;letter-spacing:-.1em;padding-right:5px}
+.topbar small{color:#c7bfc2}
+.topbar .btn.ghost{
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.18);
+  color:#f5eeee;
+}
+.topbar .btn.ghost:hover{background:rgba(229,9,37,.18);border-color:#a62b3b}
+.card{
+  background:linear-gradient(145deg,rgba(25,23,28,.98),rgba(15,15,19,.98));
+  border:1px solid #393039;
+  border-radius:16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.025);
+  color:var(--text);
+}
+.card h3{color:#f4eeee;letter-spacing:.01em}
+.context.card{background:linear-gradient(110deg,#19171c,#121216);border-color:#4a3038}
+.field label{color:#c5b9bd}
+input[type=text],input[type=date],input[type=number],input[type=password],input[type=time],select,textarea{
+  color:#f5f0f1;background:#0d0d11;border:1px solid #484047;
+  border-radius:10px;
+}
+input::placeholder,textarea::placeholder{color:#817980}
+input:focus,select:focus,textarea:focus{
+  border-color:#e02a43;background:#111015;
+  box-shadow:0 0 0 3px rgba(229,9,37,.15);
+}
+details{border-color:#55414a;background:rgba(255,255,255,.018)}
+details summary{color:#f05a6c}
+.btn{
+  background:#201c22;color:#eee7e9;border:1px solid #4b4148;
+  box-shadow:0 3px 9px rgba(0,0,0,.22);
+}
+.btn:hover{background:#30252b}
+.btn.primary{
+  color:#fff;background:linear-gradient(115deg,#a90019,#e50925 65%,#f04454);
+  border-color:#ec263e;box-shadow:0 7px 18px rgba(229,9,37,.22);
+}
+.btn.primary:hover{background:linear-gradient(115deg,#8f0015,#c90822 65%,#df3449)}
+.btn.danger{color:#ff8290;border-color:#71303a;background:#241318}
+.btn.danger:hover{background:#39151e}
+.tabs{
+  background:rgba(15,14,18,.94);border:1px solid #382d34;
+  box-shadow:0 10px 28px rgba(0,0,0,.38);backdrop-filter:blur(16px);
+}
+.tab{background:transparent;color:#b9afb4}
+.tab:hover{background:rgba(229,9,37,.12);color:#fff}
+.tab.active{
+  color:#fff;background:linear-gradient(110deg,#a90019,#e50925);
+  box-shadow:0 5px 16px rgba(229,9,37,.23);
+}
+.subtab{background:#17151a;color:#d3cbd0;border-color:#453941}
+.subtab.active{background:#3a111a;border-color:#d72a41;color:#ff6878}
+.item,.gcard,.mhs-grp-box,.tcard,.hist-card{
+  color:#eee8eb;background:linear-gradient(140deg,#1b191f,#131216);
+  border:1px solid #40353d;border-radius:13px;
+  box-shadow:0 5px 16px rgba(0,0,0,.2);
+}
+.item .nim,.ghead,.muted{color:#aaa1a6}
+.badge,.chip{background:#42151f;color:#ff8794;border:1px solid #6c2634}
+.counter span{background:#211d23;color:#e5dce0;border:1px solid #40363d}
+.st button{background:#17151a;color:#bdb4b9;border-color:#494048}
+.st button.on[data-s=H]{background:#15966b;border-color:#15966b;color:#fff}
+.st button.on[data-s=I]{background:#397fc4;border-color:#397fc4;color:#fff}
+.st button.on[data-s=S]{background:#c58a35;border-color:#c58a35;color:#fff}
+.st button.on[data-s=A]{background:#d83b50;border-color:#d83b50;color:#fff}
+.spin-box{
+  color:#fff;background:linear-gradient(130deg,#25151b,#17151b);
+  border:1.5px dashed #a52a3c;
+}
+.spin-box.spinning{color:#ff6477}
+.setbox,.source-box{background:linear-gradient(140deg,#1d191f,#151318);border-color:#55404a}
+.set-mk-bar{background:#29171d;border-color:#63303b}
+.set-mk-bar label,.pool-info{color:#ff8492}
+.mhs-grp-box h5,.day-h{color:#ff687b}
+.day-h.today{color:#fff;background:linear-gradient(90deg,#48131e,#25151b)}
+.hist-stat{background:#19171c;border-color:#40373e;color:#e9e2e5}
+.hist-names{color:#e7dfe3}
+.hist-edit-panel{background:#21171c;border-color:#a75a68}
+.hist-edit-row{background:#17151a;border-color:#463a41}
+.tcard.done{background:#15171a}
+.tcard.mhs-checked{background:#13211d;border-color:#277c5e}
+.mhs-check-wrap{background:#191b20;color:#e6e1e4;border-color:#45414a}
+.mhs-check-wrap:hover{background:#24232a;border-color:#a93a4b}
+.mhs-check-wrap.checked{background:#143126;border-color:#277c5e;color:#a8f0cf}
+.chip.warn{background:#382918;color:#f5c77f}
+.chip.late{background:#42151f;color:#ff8794}
+.chip.ok{background:#143126;color:#9ee7c6}
+.xbtn{background:#5b1824;color:#ffdce1}
+.login-wrap{
+  min-height:100vh;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 14% 18%,rgba(229,9,37,.25),transparent 28%),
+    radial-gradient(circle at 88% 84%,rgba(126,31,48,.20),transparent 30%),
+    linear-gradient(135deg,#08080a 0%,#171116 58%,#300d16 130%);
+}
+.login-wrap:before,.login-wrap:after{
+  border-color:rgba(229,9,37,.19);
+  box-shadow:0 0 0 32px rgba(229,9,37,.025),0 0 0 76px rgba(255,255,255,.012);
+}
+.login-card{
+  background:linear-gradient(145deg,rgba(29,25,31,.98),rgba(15,14,18,.98));
+  color:#f4eef0;border:1px solid #62303b;border-radius:22px;
+  box-shadow:0 28px 80px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.04);
+}
+.login-card h1{
+  color:#fff;font-weight:1000;font-style:italic;letter-spacing:.08em;
+  text-transform:uppercase;text-shadow:0 4px 22px rgba(229,9,37,.22);
+}
+.logo{display:flex;justify-content:center;filter:drop-shadow(0 8px 18px rgba(229,9,37,.24))}
+.logo-mark{width:72px;height:72px;font-size:1.35rem;padding-right:10px}
+.role span{background:#17151a;border-color:#484047;color:#f3edef}
+.role small{color:#aaa1a6}
+.role input:checked + span{
+  border-color:#e52a43;background:linear-gradient(140deg,#35131c,#21171d);
+  box-shadow:0 0 0 3px rgba(229,9,37,.12);
+}
+.login-card .muted{color:#b4aab0}
+#btnLogin{font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+.login-err,.form-err{color:#ff8794}
+.form-ok{color:#91e0bd}
+.toast{background:#2b1118;color:#fff;border:1px solid #78303d;box-shadow:0 10px 28px rgba(0,0,0,.42)}
+.empty{color:#aaa1a6}
+#lightbox{background:rgba(0,0,0,.94)}
+.btn:hover,.tab:hover,.subtab:hover,.st button:hover{box-shadow:0 7px 18px rgba(229,9,37,.13)}
+#btnSpin:not(:disabled){animation:glowCrimson 1.8s infinite}
+@keyframes glowCrimson{
+  0%,100%{box-shadow:0 0 0 0 rgba(229,9,37,.28)}
+  50%{box-shadow:0 0 0 10px rgba(229,9,37,0)}
+}
+@media(min-width:900px){
+  .topbar{border-radius:0 0 18px 18px}
+  .tabs{margin-top:12px;border-radius:15px}
+}
+@media(max-width:600px){
+  #app{padding-bottom:30px}
+  .topbar{border-radius:0 0 14px 14px;padding:13px 14px}
+  .brand-title{font-size:.98rem;letter-spacing:.08em}
+  .brand-mark{width:29px;height:29px}
+  .tabs{margin:0 9px;padding:7px;border-radius:0 0 13px 13px}
+  .card{margin:10px;border-radius:14px;padding:14px}
+  .context.card{gap:9px}
+  .login-card{padding:24px 19px}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<section id="login" class="login-wrap">
+  <div class="login-card">
+    <div class="logo"><span class="logo-mark">SG</span></div>
+    <h1>Study Group</h1>
+    <p class="muted">Masuk sebagai siapa?</p>
+
+    <div class="role-pick">
+      <label class="role">
+        <input type="radio" name="role" value="Sekretaris" checked>
+        <span><b>Sekretaris</b><small>Akses penuh</small></span>
+      </label>
+      <label class="role">
+        <input type="radio" name="role" value="Mahasiswa">
+        <span><b>Mahasiswa</b><small>Lihat riwayat &amp; tandai tugas selesai</small></span>
+      </label>
+    </div>
+
+    <input id="loginName" type="text" placeholder="Nama lengkap kamu">
+    <div id="codeWrap">
+      <input id="loginCode" type="password" placeholder="Kode Sekretaris" autocomplete="off">
+    </div>
+    <p id="loginErr" class="login-err"></p>
+    <button id="btnLogin" class="btn primary block">Masuk</button>
+    <p class="muted tiny">Terhubung ke Cloud Database • Data tersinkron untuk seluruh kelas.</p>
+  </div>
+</section>
+
+<!-- ========== APLIKASI ========== -->
+<div id="app" class="hidden">
+  <header class="topbar">
+    <div>
+      <h2 class="brand-title"><span class="brand-mark">SG</span><span>STUDY <b>GROUP</b></span></h2>
+      <small id="whoami"></small>
+    </div>
+    <div class="row gap">
+      <button id="btnRefreshCloud" class="btn ghost small" title="Sinkronkan ulang data dari server">🔄 Sync</button>
+      <button id="btnLogout" class="btn ghost small">Keluar</button>
+    </div>
+  </header>
+
+  <section class="context card">
+    <div class="field">
+      <label for="date">Tanggal</label>
+      <input id="date" type="date">
+    </div>
+    <div class="field grow">
+      <label for="matkul">Mata Kuliah</label>
+      <input id="matkul" list="matkulList" type="text" placeholder="cth: Analisis Real (opsional saat spin)">
+      <datalist id="matkulList"></datalist>
+    </div>
+    <div id="saveState" class="save-state">Memuat cloud...</div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="absen">✅ Absen</button>
+    <button class="tab" data-tab="mhs">👥 Mahasiswa</button>
+    <button class="tab" data-tab="kelompok">🎡 Kelompok</button>
+    <button class="tab" data-tab="jadwal">📅 Jadwal</button>
+    <button class="tab" data-tab="tugas">📝 Tugas</button>
+    <button class="tab" data-tab="riwayat">🗂️ Riwayat</button>
+    <button class="tab" data-tab="set">⚙️ Pengaturan</button>
+  </nav>
+
+  <!-- ===== TAB ABSEN ===== -->
+  <main id="tab-absen" class="tabpane">
+    <div class="card">
+      <div class="row between wrap">
+        <h3>Daftar Hadir</h3>
+        <div class="row gap wrap">
+          <button id="btnAllHadir" class="btn small only-edit">Semua Hadir</button>
+          <button id="btnResetAbsen" class="btn ghost small only-edit">Reset</button>
+          <button id="btnSaveAbsen" class="btn primary small only-edit">💾 Simpan Absen</button>
+        </div>
+      </div>
+      <div id="counter" class="counter"></div>
+      <div id="absenList" class="list"></div>
+      <div class="field">
+        <label for="note">Catatan (opsional)</label>
+        <input id="note" type="text" placeholder="cth: dosen memberi tugas kelompok">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>📎 Papan Klip (Rekap)</h3>
+        <button id="btnCopyRekap" class="btn primary small">Salin Semua</button>
+      </div>
+      <textarea id="rekap" rows="14" spellcheck="false"></textarea>
+      <p class="muted tiny">Rekap diperbarui otomatis. Kamu bebas mengedit teksnya sebelum disalin.</p>
+    </div>
+  </main>
+
+  <!-- ===== TAB MAHASISWA ===== -->
+  <main id="tab-mhs" class="tabpane hidden">
+    <div class="card only-edit">
+      <h3>Tambah Mahasiswa</h3>
+      <div class="row gap wrap">
+        <input id="mName" class="grow" type="text" placeholder="Nama">
+        <input id="mNim" type="text" placeholder="NIM (opsional)">
+        <button id="btnAddMhs" class="btn primary">Tambah</button>
+      </div>
+      <details>
+        <summary>Tambah banyak sekaligus</summary>
+        <textarea id="bulk" rows="6" placeholder="Satu baris satu orang.&#10;Format: Nama - NIM&#10;(NIM boleh dikosongkan)&#10;&#10;Contoh:&#10;Budi Santoso - 2023030001&#10;Siti Aminah"></textarea>
+        <button id="btnBulk" class="btn small">Tambahkan Semua</button>
+      </details>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>Daftar Kelas <span id="mCount" class="badge">0</span></h3>
+        <button id="btnClearMhs" class="btn danger small only-sek">Hapus Semua</button>
+      </div>
+      <div id="mhsList" class="list"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB SPIN & KELOMPOK ===== -->
+  <main id="tab-kelompok" class="tabpane hidden">
+    <div class="card only-edit" id="spinCard">
+      <h3>🎡 Spin Pembagian Kelompok</h3>
+      <div class="role-pick mode-pick">
+        <label class="role">
+          <input type="radio" name="spinMode" value="auto" checked>
+          <span><b>⚡ Otomatis</b><small>Roda berputar, semua langsung dibagi kelompok</small></span>
+        </label>
+        <label class="role">
+          <input type="radio" name="spinMode" value="indiv">
+          <span><b>🎯 Individu</b><small>Spin satu per satu, untuk apa saja</small></span>
+        </label>
+      </div>
+
+      <div id="wSrcWrap" class="role-pick hidden">
+        <label class="role">
+          <input type="radio" name="wSrc" value="peserta" checked>
+          <span><b>👥 Nama peserta</b><small>Dari daftar di bawah</small></span>
+        </label>
+        <label class="role">
+          <input type="radio" name="wSrc" value="custom">
+          <span><b>✏️ Daftar sendiri</b><small>Topik, tugas, giliran, dll</small></span>
+        </label>
+      </div>
+
+      <div class="source-box" id="sourceBox">
+        <b>Sumber nama peserta</b>
+        <label class="check"><input id="usePTI" type="checkbox" checked> Ambil dari daftar kelas (<span id="ptiCount">0</span> orang)</label>
+        <label class="check sub"><input id="onlyPresent" type="checkbox"> Hanya yang hadir hari ini</label>
+        <div class="field">
+          <label for="extraNames">Tambah nama lain (kelas gabungan / tamu). Satu baris satu orang, format: Nama - NIM (NIM opsional)</label>
+          <textarea id="extraNames" rows="3" placeholder="Contoh:&#10;Andi Pratama - 2023030111&#10;Rina Wulandari"></textarea>
+        </div>
+        <div id="poolInfo" class="pool-info"></div>
+      </div>
+
+      <div class="source-box hidden" id="customBox">
+        <div class="field">
+          <label for="wheelList">Isi roda. Satu baris satu item (contoh: topik presentasi, giliran maju, hadiah)</label>
+          <textarea id="wheelList" rows="5" placeholder="Contoh:&#10;Topik 1&#10;Topik 2&#10;Topik 3"></textarea>
+        </div>
+      </div>
+
+      <div id="wOptions" class="source-box hidden">
+        <label class="check"><input id="wNoRepeat" type="checkbox" checked> Hasil yang sudah keluar dihapus dari roda (tidak terulang)</label>
+        <label class="check" id="wAssignLbl"><input id="wAssign" type="checkbox"> Masukkan hasil spin ke kelompok</label>
+      </div>
+
+      <div class="field" id="gCountField">
+        <label for="gCount">Jumlah kelompok</label>
+        <input id="gCount" type="number" min="2" value="4">
+      </div>
+
+      <div class="wheel-wrap">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="680" height="680"></canvas>
+      </div>
+      <div id="wheelInfo" class="pool-info center"></div>
+      <div id="spinBox" class="spin-box">Tekan SPIN!</div>
+      <button id="btnSpin" class="btn primary block big">🎲 SPIN</button>
+
+      <div id="spinLogWrap" class="hidden">
+        <div class="row between wrap">
+          <b>Hasil spin</b>
+          <div class="row gap wrap">
+            <button id="btnCopyLog" class="btn small">Salin Hasil</button>
+            <button id="btnResetWheel" class="btn danger small">Reset Roda</button>
+          </div>
+        </div>
+        <ol id="spinLog" class="spin-log"></ol>
+      </div>
+    </div>
+
+    <div class="card only-edit" id="draftGroupCard">
+      <div class="row between wrap">
+        <h3>Tambah / Edit Kelompok Baru</h3>
+        <div class="row gap wrap">
+          <button id="btnAddGroup" class="btn small">➕ Tambah Kelompok</button>
+          <button id="btnSaveSet" class="btn primary small">💾 Simpan Kelompok</button>
+          <button id="btnClearGroups" class="btn danger small">Kosongkan Form</button>
+          <button id="btnCopyGroups" class="btn small">Salin</button>
+        </div>
+      </div>
+      <p class="muted tiny">
+        Setelah selesai spin atau menyusun kelompok, tekan <b>"💾 Simpan Kelompok"</b> untuk menyimpan ke daftar publik &amp; mereset form ini agar siap dipakai lagi. Jika kolom Mata Kuliah di atas belum diisi, kelompok tetap tersimpan sebagai <b>"Belum Ada Mata Kuliah"</b> dan bisa diedit kapan saja di bawah.
+      </p>
+      <div id="groupsWrap" class="groups"></div>
+      <datalist id="availList"></datalist>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>📚 Daftar Pembagian Kelompok <span id="totalSetsBadge" class="badge">0</span></h3>
+        <select id="filterSetMatkul" style="width:auto"></select>
+      </div>
+      <div id="setsList" class="list"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB JADWAL ===== -->
+  <main id="tab-jadwal" class="tabpane hidden">
+    <div class="card only-edit">
+      <h3 id="jFormTitle">Tambah Jadwal</h3>
+      <div class="grid2">
+        <div class="field">
+          <label for="jHari">Hari</label>
+          <select id="jHari"></select>
+        </div>
+        <div class="field">
+          <label for="jMatkul">Mata Kuliah</label>
+          <input id="jMatkul" list="matkulList" type="text" placeholder="cth: Analisis Real">
+        </div>
+        <div class="field">
+          <label for="jMulai">Jam mulai</label>
+          <input id="jMulai" type="time">
+        </div>
+        <div class="field">
+          <label for="jSelesai">Jam selesai</label>
+          <input id="jSelesai" type="time">
+        </div>
+      </div>
+      <div class="field">
+        <label for="jDosen">Dosen pengampu</label>
+        <input id="jDosen" type="text" placeholder="cth: Nur Hasanah, M.Pd">
+      </div>
+      <div class="row gap wrap">
+        <button id="btnSaveJadwal" class="btn primary">Tambah Jadwal</button>
+        <button id="btnCancelJadwal" class="btn hidden">Batal Edit</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>📅 Jadwal Mingguan</h3>
+        <button id="btnCopyJadwal" class="btn small">Salin Jadwal</button>
+      </div>
+      <div id="jadwalList" class="list"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB TUGAS ===== -->
+  <main id="tab-tugas" class="tabpane hidden">
+    <div class="card only-edit">
+      <h3 id="tFormTitle">Tambah Tugas</h3>
+      <div class="grid2">
+        <div class="field">
+          <label for="tMatkul">Mata Kuliah</label>
+          <input id="tMatkul" list="matkulList" type="text" placeholder="cth: Analisis Real">
+        </div>
+        <div class="field">
+          <label for="tDeadline">Batas pengumpulan (opsional)</label>
+          <input id="tDeadline" type="date">
+        </div>
+      </div>
+      <div class="field">
+        <label for="tJudul">Judul tugas</label>
+        <input id="tJudul" type="text" placeholder="cth: Artikel kajian pustaka">
+      </div>
+      <div class="field">
+        <label for="tDesc">Penjelasan tugas</label>
+        <textarea id="tDesc" rows="5" style="font-family:inherit;font-size:.95rem" placeholder="Jelaskan apa saja yang harus dikerjakan..."></textarea>
+      </div>
+      <div class="field">
+        <label for="tFiles">Gambar pendukung (opsional)</label>
+        <input id="tFiles" type="file" accept="image/*" multiple>
+      </div>
+      <div id="tPreview" class="pending"></div>
+      <div class="row gap wrap">
+        <button id="btnSaveTugas" class="btn primary">Tambah Tugas</button>
+        <button id="btnCancelTugas" class="btn hidden">Batal Edit</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between wrap">
+        <h3>📝 Daftar Tugas <span id="tCount" class="badge">0</span></h3>
+        <div class="row gap wrap">
+          <input id="tSearch" type="text" placeholder="Cari tugas / matkul..." style="width:auto;min-width:170px">
+          <select id="tFilter" style="width:auto"></select>
+          <label class="check" style="padding-bottom:0"><input id="tHideDone" type="checkbox"> Sembunyikan yang selesai</label>
+        </div>
+      </div>
+      <div id="tugasList" class="list"></div>
+    </div>
+  </main>
+
+  <!-- ===== TAB RIWAYAT ===== -->
+  <main id="tab-riwayat" class="tabpane hidden">
+    <div class="card">
+      <div class="subtabs">
+        <button class="subtab active" data-h="absen">✅ Riwayat Absen</button>
+        <button class="subtab" data-h="kel">🎡 Riwayat Kelompok</button>
+      </div>
+      <div id="histAbsenPane" class="list">
+        <input id="histSearchAbsen" class="hist-search" type="text" placeholder="🔍 Cari berdasarkan nama mata kuliah..." autocomplete="off">
+        <div id="histAbsen" class="list"></div>
+      </div>
+      <div id="histKelPane" class="list hidden">
+        <input id="histSearchKel" class="hist-search" type="text" placeholder="🔍 Cari berdasarkan nama mata kuliah..." autocomplete="off">
+        <div id="histKel" class="list"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== TAB PENGATURAN ===== -->
+  <main id="tab-set" class="tabpane hidden">
+    <div class="card only-edit">
+      <h3>🔑 Ganti Sandi Sekretaris</h3>
+      <div class="field">
+        <label for="codeOld">Sandi lama</label>
+        <input id="codeOld" type="password" autocomplete="off">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="codeNew">Sandi baru (min. 4 karakter)</label>
+          <input id="codeNew" type="password" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="codeNew2">Ulangi sandi baru</label>
+          <input id="codeNew2" type="password" autocomplete="off">
+        </div>
+      </div>
+      <p id="codeMsg" class="form-err"></p>
+      <button id="btnChangeCode" class="btn primary">Simpan Sandi Baru</button>
+      <p class="muted tiny">Sandi disimpan di Cloud Database sehingga berlaku di semua perangkat.</p>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="lightbox" class="hidden"><img alt=""></div>
+
+<script>
+/* ================= KONFIGURASI CLOUD DATABASE ================= */
+const FIREBASE_DB_URL = "https://classora-pti-default-rtdb.asia-southeast1.firebasedatabase.app";
+const DB_NODE = "classora_pti_data";
+const isConfigured = () => Boolean(FIREBASE_DB_URL);
+
+const KEY_SES = 'classora_session_v2';
+const KEY_MHS_TUGAS = 'classora_mhs_tugas_done_v1';
+const DEFAULT_CODE = '11223344';
+
+/* ================= STATE UTAMA (TERPUSAT DI CLOUD) ================= */
+let cloudState = {
+  students: [],
+  records: {},
+  savedGroups: [],
+  jadwal: [],
+  tugas: [],
+  secretCode: DEFAULT_CODE,
+  updatedAt: 0
+};
+
+let session = (() => {
+  try {
+    const raw = sessionStorage.getItem(KEY_SES) || localStorage.getItem(KEY_SES);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed && (parsed.role === 'Sekretaris' || parsed.role === 'Mahasiswa')) return parsed;
+    return null;
+  } catch { return null; }
+})();
+
+// Penyimpanan centang tugas pribadi per mahasiswa
+function getMhsDoneMap() {
+  try {
+    const all = JSON.parse(localStorage.getItem(KEY_MHS_TUGAS) || '{}');
+    const userKey = (session && session.name ? session.name.trim().toLowerCase() : 'default');
+    return all[userKey] || {};
+  } catch { return {}; }
+}
+function toggleMhsTugasDone(tugasId) {
+  if (!isMhs()) return false;
+  try {
+    const all = JSON.parse(localStorage.getItem(KEY_MHS_TUGAS) || '{}');
+    const userKey = (session && session.name ? session.name.trim().toLowerCase() : 'default');
+    if (!all[userKey]) all[userKey] = {};
+    all[userKey][tugasId] = !all[userKey][tugasId];
+    localStorage.setItem(KEY_MHS_TUGAS, JSON.stringify(all));
+    return all[userKey][tugasId];
+  } catch { return false; }
+}
+
+let status = {};
+let isAbsenDirty = false;
+let clearedAbsenKey = null;
+let editingAbsenKey = null;
+let editingAbsenDraft = null;
+let editingKelId = null;
+let editingKelDraft = null;
+let curGroups = [];
+let spinResults = [];
+let wheelAngle = 0, wheelBusy = false;
+let isSyncing = false;
+let lastServerTimestamp = 0;
+let currentActiveTab = 'absen';
+
+const $  = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const mod = (a, m) => ((a % m) + m) % m;
+
+const STATUS = { H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' };
+const HARI = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+const isMhs = () => Boolean(session && session.role === 'Mahasiswa');
+const canEdit = () => Boolean(session && session.role === 'Sekretaris');
+const getCode = () => cloudState.secretCode || DEFAULT_CODE;
+
+function todayStr() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 10);
+}
+function fmtDate(s) {
+  if (!s) return '-';
+  return new Date(s + 'T00:00:00').toLocaleDateString('id-ID',
+    { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+function fmtShort(s) {
+  if (!s) return '';
+  const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`;
+}
+const ctxKey = (date = $('#date').value, matkul = $('#matkul').value) =>
+  matkul.trim() ? `${date}|${matkul.trim().toLowerCase()}` : null;
+const goTab = name => {
+  const btn = document.querySelector(`.tab[data-tab=${name}]`);
+  if (btn) btn.click();
+};
+
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  toast('Tersalin ke papan klip ✓');
+}
+function setSaveState(msg, cls) {
+  const el = $('#saveState'); el.textContent = msg; el.className = 'save-state ' + (cls || '');
+}
+
+/* ================= FUNGSI SINKRONISASI CLOUD ================= */
+async function pullFromCloud(silent = false) {
+  if (!isConfigured()) return;
+  if (isSyncing) return;
+  isSyncing = true;
+  if (!silent) setSaveState('Menyinkronkan cloud...', 'warn');
+  try {
+    const res = await fetch(`${FIREBASE_DB_URL}/${DB_NODE}.json?t=${Date.now()}`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data && typeof data === 'object') {
+      const serverTs = data.updatedAt || 0;
+      if (serverTs !== lastServerTimestamp || !silent) {
+        cloudState = {
+          students: Array.isArray(data.students) ? data.students : [],
+          records: data.records && typeof data.records === 'object' ? data.records : {},
+          savedGroups: Array.isArray(data.savedGroups) ? data.savedGroups : [],
+          jadwal: Array.isArray(data.jadwal) ? data.jadwal : [],
+          tugas: Array.isArray(data.tugas) ? data.tugas : [],
+          secretCode: data.secretCode || DEFAULT_CODE,
+          updatedAt: serverTs
+        };
+        lastServerTimestamp = serverTs;
+        refreshAllViews(!silent);
+      }
+    }
+    setSaveState('Cloud Tersinkron ✓', 'ok');
+  } catch (err) {
+    console.error('Cloud Pull Error:', err);
+    setSaveState('Gagal terhubung ke cloud', 'err');
+  } finally {
+    isSyncing = false;
+  }
+}
+
+let pushTimer = null;
+function pushToCloud(immediate = false) {
+  if (!canEdit()) return;
+  if (!isConfigured()) return;
+  cloudState.updatedAt = Date.now();
+  lastServerTimestamp = cloudState.updatedAt;
+  setSaveState('Menyimpan ke cloud...', 'warn');
+
+  const execPush = async () => {
+    try {
+      const res = await fetch(`${FIREBASE_DB_URL}/${DB_NODE}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cloudState)
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      isAbsenDirty = false;
+      setSaveState('Tersimpan di Cloud ✓', 'ok');
+    } catch (err) {
+      console.error('Cloud Push Error:', err);
+      setSaveState('Gagal menyimpan ke cloud!', 'err');
+      toast('Gagal menyimpan ke server cloud');
+    }
+  };
+
+  clearTimeout(pushTimer);
+  if (immediate) execPush();
+  else pushTimer = setTimeout(execPush, 700);
+}
+
+setInterval(() => {
+  if (session && !wheelBusy && !isAbsenDirty && !editingAbsenKey && !editingKelId) {
+    const activeEl = document.activeElement;
+    if (activeEl && $('#setsList') && $('#setsList').contains(activeEl)) return;
+    pullFromCloud(true);
+  }
+}, 7000);
+
+$('#btnRefreshCloud').onclick = () => {
+  isAbsenDirty = false;
+  pullFromCloud(false);
+  toast('Memperbarui data dari cloud...');
+};
+
+/* ================= LOGIN & VALIDASI ================= */
+function enforceRoleLock() {
+  const mhs = isMhs();
+  document.body.classList.toggle('role-mhs', mhs);
+  $('#note').readOnly = mhs;
+  $('#rekap').readOnly = true;
+  $('#date').readOnly = mhs;
+  $('#matkul').readOnly = mhs;
+}
+
+function applySession() {
+  if (!session) {
+    document.body.classList.remove('role-mhs');
+    $('#login').classList.remove('hidden');
+    $('#app').classList.add('hidden');
+    return;
+  }
+  $('#login').classList.add('hidden');
+  $('#app').classList.remove('hidden');
+  enforceRoleLock();
+  if (isMhs()) {
+    currentActiveTab = 'absen';
+    $$('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === 'absen'));
+    $$('.tabpane').forEach(p => p.classList.toggle('hidden', p.id !== 'tab-absen'));
+    updateContextVisibility('absen');
+  }
+  $('#whoami').textContent = `${session.role} • ${session.name}`;
+  initApp();
+}
+
+function toggleCode() {
+  const role = document.querySelector('input[name=role]:checked').value;
+  $('#codeWrap').classList.toggle('hidden', role !== 'Sekretaris');
+  $('#loginName').placeholder = role === 'Sekretaris' ? 'Nama Sekretaris (opsional)' : 'Masukkan nama kamu (wajib diisi)';
+  $('#loginErr').textContent = '';
+}
+$$('input[name=role]').forEach(r => r.onchange = toggleCode);
+toggleCode();
+
+async function doLogin() {
+  const role = document.querySelector('input[name=role]:checked').value;
+  const trimmedName = $('#loginName').value.trim();
+  const errEl = $('#loginErr');
+  errEl.textContent = '';
+
+  const shakeCard = (msg) => {
+    errEl.textContent = msg;
+    const c = document.querySelector('.login-card');
+    c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+  };
+
+  if (role === 'Mahasiswa') {
+    if (trimmedName === '') {
+      shakeCard('Nama wajib diisi sebelum masuk!');
+      $('#loginName').focus();
+      return;
+    }
+    session = { role: 'Mahasiswa', name: trimmedName };
+  } else {
+    if (isConfigured()) await pullFromCloud(true);
+    if ($('#loginCode').value.trim() !== getCode()) {
+      shakeCard('Kode Sekretaris salah.');
+      return;
+    }
+    session = { role: 'Sekretaris', name: trimmedName || 'Sekretaris' };
+  }
+
+  $('#loginCode').value = '';
+  try {
+    sessionStorage.setItem(KEY_SES, JSON.stringify(session));
+    localStorage.setItem(KEY_SES, JSON.stringify(session));
+  } catch {}
+  applySession();
+}
+
+$('#btnLogin').onclick = doLogin;
+$('#loginName').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+$('#loginCode').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+$('#btnLogout').onclick = () => {
+  try {
+    sessionStorage.removeItem(KEY_SES);
+    localStorage.removeItem(KEY_SES);
+  } catch {}
+  session = null;
+  applySession();
+};
+
+/* ================= TAB NAVIGASI & KONTEKS DINAMIS ================= */
+function updateContextVisibility(activeTab = currentActiveTab) {
+  const ctxCard = document.querySelector('.context.card');
+  const dateField = $('#date').closest('.field');
+  const matkulField = $('#matkul').closest('.field');
+
+  const showInputs = (activeTab === 'absen') || (activeTab === 'kelompok' && canEdit());
+
+  dateField.classList.toggle('hidden', !showInputs);
+  matkulField.classList.toggle('hidden', !showInputs);
+
+  ctxCard.style.padding = showInputs ? '16px' : '10px 16px';
+  ctxCard.style.justifyContent = showInputs ? 'flex-start' : 'flex-end';
+}
+
+$$('.tab').forEach(b => b.onclick = () => {
+  const t = b.dataset.tab;
+  if (isMhs() && (t === 'mhs' || t === 'set')) {
+    toast('Akses khusus Sekretaris');
+    return;
+  }
+  $$('.tab').forEach(x => x.classList.toggle('active', x === b));
+  $$('.tabpane').forEach(p => p.classList.add('hidden'));
+  currentActiveTab = t;
+  $('#tab-' + t).classList.remove('hidden');
+
+  updateContextVisibility(t);
+
+  if (t === 'riwayat') renderHistory();
+  if (t === 'jadwal') renderJadwal();
+  if (t === 'tugas') renderTugas();
+  if (t === 'kelompok') { renderSavedGroups(); refreshWheel(); }
+});
+
+/* ================= KONTEKS (TANGGAL + MATKUL) ================= */
+function refreshMatkulList() {
+  const set = new Set();
+  Object.values(cloudState.records).forEach(r => r.matkul && set.add(r.matkul));
+  cloudState.savedGroups.forEach(g => g.matkul && g.matkul !== 'Belum Ada Mata Kuliah' && set.add(g.matkul));
+  cloudState.jadwal.forEach(j => j.matkul && set.add(j.matkul));
+  cloudState.tugas.forEach(t => t.matkul && set.add(t.matkul));
+  $('#matkulList').innerHTML = [...set].map(m => `<option value="${esc(m)}">`).join('');
+}
+
+function loadContext() {
+  const key = ctxKey();
+  const rec = key && cloudState.records[key];
+
+  // Setelah absensi disimpan, form untuk konteks yang sama tetap kosong.
+  // Data aslinya tetap tersimpan dan bisa dilihat atau diedit dari Riwayat.
+  if (key && key === clearedAbsenKey) {
+    status = {};
+    $('#note').value = '';
+  } else if (rec) {
+    status = rec.status ? { ...rec.status } : {};
+    $('#note').value = rec.note || '';
+  } else if (!isAbsenDirty) {
+    status = {};
+    $('#note').value = '';
+  }
+  renderAbsen();
+}
+
+function openContext(date, matkul) {
+  isAbsenDirty = false;
+  $('#date').value = date;
+  $('#matkul').value = matkul;
+  loadContext();
+}
+$('#date').onchange = () => {
+  if (isMhs()) return;
+  isAbsenDirty = false;
+  clearedAbsenKey = null;
+  loadContext();
+};
+$('#matkul').onchange = () => {
+  if (isMhs()) return;
+  clearedAbsenKey = null;
+  const key = ctxKey();
+  if (key && cloudState.records[key]) {
+    isAbsenDirty = false;
+    loadContext();
+  } else {
+    updateRekap();
+  }
+};
+$('#matkul').oninput = () => {
+  if (isMhs()) return;
+  updateRekap();
+};
+
+function refreshAllViews(forceLoadCtx = false) {
+  enforceRoleLock();
+  renderStudents();
+  refreshMatkulList();
+  if (forceLoadCtx || !isAbsenDirty) {
+    loadContext();
+  } else {
+    updateCounter();
+    updateRekap();
+  }
+  renderGroups();
+  renderSavedGroups();
+  renderJadwal();
+  renderTugas();
+  if (!editingAbsenKey && !editingKelId) renderHistory();
+  updateContextVisibility(currentActiveTab);
+}
+
+/* ================= MAHASISWA ================= */
+function addStudent(name, nim) {
+  if (!canEdit()) return false;
+  name = name.trim(); if (!name) return false;
+  cloudState.students.push({ id: uid(), name, nim: (nim || '').trim() });
+  return true;
+}
+function saveStudents() {
+  if (!canEdit()) return;
+  pushToCloud(true);
+  renderStudents();
+  renderAbsen();
+}
+
+$('#btnAddMhs').onclick = () => {
+  if (!canEdit()) return;
+  if (addStudent($('#mName').value, $('#mNim').value)) {
+    $('#mName').value = ''; $('#mNim').value = ''; $('#mName').focus(); saveStudents();
+  }
+};
+$('#mName').onkeydown = e => { if (e.key === 'Enter' && canEdit()) $('#btnAddMhs').click(); };
+$('#mNim').onkeydown  = e => { if (e.key === 'Enter' && canEdit()) $('#btnAddMhs').click(); };
+
+$('#btnBulk').onclick = () => {
+  if (!canEdit()) return;
+  let n = 0;
+  $('#bulk').value.split('\n').forEach(line => {
+    const parts = line.split(/\s[-–,]\s|\t/);
+    if (addStudent(parts[0] || '', parts[1] || '')) n++;
+  });
+  $('#bulk').value = ''; saveStudents(); toast(`${n} mahasiswa ditambahkan`);
+};
+$('#btnClearMhs').onclick = () => {
+  if (!canEdit()) return;
+  if (confirm('Hapus SEMUA daftar mahasiswa? (riwayat absen tetap ada)')) {
+    cloudState.students = []; saveStudents();
+  }
+};
+function renderStudents() {
+  const list = cloudState.students;
+  $('#mCount').textContent = list.length;
+  $('#mhsList').innerHTML = list.length ? list.map((s, i) => `
+    <div class="item">
+      <div><span class="nm">${i + 1}. ${esc(s.name)}</span>${s.nim ? `<div class="nim">${esc(s.nim)}</div>` : ''}</div>
+      <div class="row gap only-edit">
+        <button class="btn small" data-edit="${s.id}">Edit</button>
+        <button class="btn small danger only-sek" data-del="${s.id}">Hapus</button>
+      </div>
+    </div>`).join('') : '<div class="empty">Belum ada mahasiswa. Tambahkan di atas.</div>';
+}
+$('#mhsList').onclick = e => {
+  if (!canEdit()) return;
+  const del = e.target.dataset.del, ed = e.target.dataset.edit;
+  if (del) { cloudState.students = cloudState.students.filter(s => s.id !== del); saveStudents(); }
+  if (ed) {
+    const s = cloudState.students.find(x => x.id === ed);
+    if (!s) return;
+    const nm = prompt('Nama:', s.name); if (nm === null) return;
+    const nim = prompt('NIM (boleh kosong):', s.nim || ''); if (nim === null) return;
+    s.name = nm.trim() || s.name; s.nim = nim.trim(); saveStudents();
+  }
+};
+
+/* ================= ABSEN ================= */
+function renderAbsen() {
+  const list = cloudState.students;
+  $('#absenList').innerHTML = list.length ? list.map((s, i) => `
+    <div class="item">
+      <div><span class="nm">${i + 1}. ${esc(s.name)}</span>${s.nim ? `<div class="nim">${esc(s.nim)}</div>` : ''}</div>
+      <div class="st" data-id="${s.id}">
+        ${Object.keys(STATUS).map(k => `<button type="button" data-s="${k}" title="${STATUS[k]}" class="${status[s.id] === k ? 'on' : ''}">${k}</button>`).join('')}
+      </div>
+    </div>`).join('') : '<div class="empty">Belum ada daftar mahasiswa.</div>';
+  updateCounter(); updateRekap(); updatePoolInfo();
+}
+
+$('#absenList').onclick = e => {
+  if (!canEdit()) return;
+  const btn = e.target.closest('button[data-s]');
+  if (!btn) return;
+  const stGroup = btn.parentElement;
+  const id = stGroup.dataset.id;
+  const s = btn.dataset.s;
+
+  status[id] = s;
+  isAbsenDirty = true;
+
+  stGroup.querySelectorAll('button[data-s]').forEach(b => {
+    b.classList.toggle('on', b === btn);
+    b.classList.remove('pop-click');
+  });
+
+  void btn.offsetWidth;
+  btn.classList.add('pop-click');
+
+  updateCounter();
+  updateRekap();
+  updatePoolInfo();
+  autosaveAbsen();
+};
+
+$('#btnAllHadir').onclick = () => {
+  if (!canEdit()) return;
+  cloudState.students.forEach(s => status[s.id] = 'H');
+  isAbsenDirty = true;
+  renderAbsen();
+  autosaveAbsen();
+};
+$('#btnResetAbsen').onclick = () => {
+  if (!canEdit()) return;
+  if (confirm('Kosongkan semua status absen?')) {
+    status = {};
+    isAbsenDirty = true;
+    renderAbsen();
+    autosaveAbsen();
+  }
+};
+$('#note').oninput = () => {
+  if (!canEdit()) return;
+  isAbsenDirty = true;
+  updateRekap();
+  autosaveAbsen();
+};
+
+function updateCounter() {
+  const c = { H: 0, I: 0, S: 0, A: 0 };
+  cloudState.students.forEach(s => { if (status[s.id]) c[status[s.id]]++; });
+  const belum = cloudState.students.length - Object.values(c).reduce((a, b) => a + b, 0);
+  $('#counter').innerHTML = Object.keys(c).map(k => `<span>${STATUS[k]}: <b>${c[k]}</b></span>`).join('') +
+    `<span>Belum: <b>${belum}</b></span>`;
+}
+function buildRekapFrom(d) {
+  const lines = ['ABSENSI KELAS', `Mata Kuliah : ${d.matkul || '-'}`, `Tanggal     : ${fmtDate(d.date)}`, ''];
+  const label = s => s.name + (s.nim ? ` (${s.nim})` : '');
+  const stMap = d.status || {};
+  Object.keys(STATUS).forEach(k => {
+    const list = cloudState.students.filter(s => stMap[s.id] === k);
+    lines.push(`${STATUS[k].toUpperCase()} (${list.length})`);
+    if (list.length) list.forEach((s, i) => lines.push(`${i + 1}. ${label(s)}`)); else lines.push('-');
+    lines.push('');
+  });
+  const belum = cloudState.students.filter(s => !stMap[s.id]);
+  if (belum.length) {
+    lines.push(`BELUM DIISI (${belum.length})`);
+    belum.forEach((s, i) => lines.push(`${i + 1}. ${label(s)}`)); lines.push('');
+  }
+  const note = (d.note || '').trim(); if (note) lines.push(`Catatan: ${note}`);
+  lines.push(`Total mahasiswa: ${cloudState.students.length}`);
+  return lines.join('\n');
+}
+function updateRekap() {
+  $('#rekap').value = buildRekapFrom({ matkul: $('#matkul').value.trim(), date: $('#date').value, status, note: $('#note').value });
+}
+$('#btnCopyRekap').onclick = () => copyText($('#rekap').value);
+
+function saveAbsenToCloud(immediate = false, silentWarn = false) {
+  if (!canEdit()) return false;
+
+  const date = $('#date').value;
+  const matkul = $('#matkul').value.trim();
+
+  if (!date) {
+    if (!silentWarn) {
+      setSaveState('Pilih tanggal terlebih dahulu', 'warn');
+      toast('Tanggal absen belum dipilih');
+    }
+    return false;
+  }
+  if (!matkul) {
+    if (!silentWarn) {
+      setSaveState('Isi mata kuliah agar absen tersimpan', 'warn');
+      toast('Isi nama mata kuliah sebelum menyimpan absen');
+      $('#matkul').focus();
+    } else {
+      setSaveState('Belum disimpan (isi Mata Kuliah)', 'warn');
+    }
+    return false;
+  }
+
+  const key = ctxKey(date, matkul);
+  cloudState.records[key] = {
+    date,
+    matkul,
+    status: { ...status },
+    note: $('#note').value
+  };
+
+  refreshMatkulList();
+  pushToCloud(immediate);
+  return true;
+}
+
+function autosaveAbsen() {
+  saveAbsenToCloud(false, true);
+}
+
+$('#btnSaveAbsen').onclick = () => {
+  if (!canEdit()) return;
+  if (saveAbsenToCloud(true, false)) {
+    // Simpan dulu data lengkap ke Riwayat/Cloud, baru kosongkan form input.
+    clearedAbsenKey = ctxKey();
+    status = {};
+    $('#note').value = '';
+    isAbsenDirty = false;
+    $('#btnSaveAbsen').textContent = '💾 Simpan Absen';
+    renderAbsen();
+    renderHistory();
+    toast('Absensi tersimpan. Form absen sudah dikosongkan ✓');
+  }
+};
+
+/* ================= RODA SPIN ================= */
+const WHEEL_COLORS = ['#4f46e5', '#9333ea', '#db2777', '#ea580c', '#16a34a', '#0891b2', '#ca8a04', '#2563eb', '#dc2626', '#0d9488'];
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const labelOf = s => s.name + (s.nim ? ` (${s.nim})` : '');
+const getMode = () => document.querySelector('input[name=spinMode]:checked').value;
+const wSrc = () => document.querySelector('input[name=wSrc]:checked').value;
+const assignOn = () => getMode() === 'indiv' && wSrc() === 'peserta' && $('#wAssign').checked;
+
+function parseExtra() {
+  return $('#extraNames').value.split('\n').map(l => {
+    const p = l.split(/\s[-–,]\s|\t/);
+    return { name: (p[0] || '').trim(), nim: (p[1] || '').trim() };
+  }).filter(x => x.name);
+}
+function getPool() {
+  let base = [];
+  if ($('#usePTI').checked) {
+    base = $('#onlyPresent').checked
+      ? cloudState.students.filter(s => status[s.id] === 'H')
+      : [...cloudState.students];
+  }
+  const seen = new Set(base.map(s => s.name.toLowerCase()));
+  parseExtra().forEach(x => {
+    if (!seen.has(x.name.toLowerCase())) { seen.add(x.name.toLowerCase()); base.push(x); }
+  });
+  return base;
+}
+function parseLines(t) { return t.split('\n').map(x => x.trim()).filter(Boolean); }
+
+function wheelCandidates() {
+  if (getMode() === 'auto') return getPool().map(s => ({ name: s.name, label: labelOf(s) }));
+  let items = wSrc() === 'peserta'
+    ? getPool().map(s => ({ name: s.name, label: labelOf(s) }))
+    : parseLines($('#wheelList').value).map(t => ({ name: t, label: t }));
+  if (assignOn()) {
+    const used = new Set(curGroups.flatMap(g => g.members));
+    items = items.filter(x => !used.has(x.label));
+  }
+  if ($('#wNoRepeat').checked) {
+    const won = [...spinResults];
+    items = items.filter(x => { const i = won.indexOf(x.label); if (i > -1) { won.splice(i, 1); return false; } return true; });
+  }
+  return items;
+}
+
+function drawWheel(items, ang) {
+  const c = $('#wheel'), ctx = c.getContext('2d');
+  const W = c.width, cx = W / 2, cy = W / 2, R = W / 2 - 12, n = items.length;
+  ctx.clearRect(0, 0, W, W);
+  if (!n) {
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, 2 * Math.PI); ctx.fillStyle = '#e5e7eb'; ctx.fill();
+    ctx.fillStyle = '#6b7280'; ctx.font = 'bold 34px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Roda kosong', cx, cy); return;
+  }
+  const seg = 2 * Math.PI / n;
+  for (let i = 0; i < n; i++) {
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, ang + i * seg, ang + (i + 1) * seg); ctx.closePath();
+    ctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length]; ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+  }
+  const fs = Math.min(30, R * 0.6 * seg * 0.7);
+  if (fs >= 9 || n === 1) {
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+    for (let i = 0; i < n; i++) {
+      let t = items[i].name; if (t.length > 20) t = t.slice(0, 19) + '…';
+      let f = n === 1 ? 30 : fs; ctx.font = `bold ${f}px system-ui,sans-serif`;
+      while (ctx.measureText(t).width > R - 80 && f > 9) { f--; ctx.font = `bold ${f}px system-ui,sans-serif`; }
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang + (i + 0.5) * seg);
+      ctx.fillText(t, R - 20, 0); ctx.restore();
+    }
+  }
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, 2 * Math.PI); ctx.lineWidth = 8; ctx.strokeStyle = '#111827'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, 36, 0, 2 * Math.PI); ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.lineWidth = 6; ctx.strokeStyle = '#111827'; ctx.stroke();
+  ctx.fillStyle = '#111827'; ctx.font = '30px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('🎯', cx, cy + 2);
+}
+
+function refreshWheel() {
+  if (wheelBusy || !canEdit()) return;
+  const items = wheelCandidates();
+  $('#wheelInfo').textContent = `Isi roda: ${items.length} item`;
+  drawWheel(items, wheelAngle);
+}
+
+function spinWheel(items, ms = 3800) {
+  return new Promise(resolve => {
+    const n = items.length, seg = 2 * Math.PI / n;
+    const idx = Math.floor(Math.random() * n);
+    const jitter = (Math.random() - 0.5) * 0.7 * seg;
+    const target = mod(-Math.PI / 2 - (idx + 0.5) * seg + jitter, 2 * Math.PI);
+    const delta = mod(target - mod(wheelAngle, 2 * Math.PI), 2 * Math.PI);
+    const start = wheelAngle, end = start + delta + 2 * Math.PI * (5 + Math.floor(Math.random() * 3));
+    const t0 = performance.now();
+    wheelBusy = true;
+    (function frame(t) {
+      const p = Math.min(1, (t - t0) / ms);
+      wheelAngle = start + (end - start) * (1 - Math.pow(1 - p, 4));
+      drawWheel(items, wheelAngle);
+      if (p < 1) requestAnimationFrame(frame); else { wheelBusy = false; resolve(idx); }
+    })(t0);
+  });
+}
+
+function syncSpinUI() {
+  const indiv = getMode() === 'indiv', custom = indiv && wSrc() === 'custom';
+  $('#wSrcWrap').classList.toggle('hidden', !indiv);
+  $('#sourceBox').classList.toggle('hidden', custom);
+  $('#customBox').classList.toggle('hidden', !custom);
+  $('#wOptions').classList.toggle('hidden', !indiv);
+  $('#wAssignLbl').classList.toggle('hidden', custom);
+  $('#gCountField').classList.toggle('hidden', indiv && !assignOn());
+  $('#spinLogWrap').classList.toggle('hidden', !indiv);
+  $('#btnSpin').textContent = indiv ? '🎯 SPIN RODA' : '🎲 SPIN & BAGI KELOMPOK';
+}
+
+function updatePoolInfo() {
+  $('#ptiCount').textContent = cloudState.students.length;
+  $('#onlyPresent').disabled = !$('#usePTI').checked;
+  $('#poolInfo').textContent = `Total peserta: ${getPool().length} orang`;
+  refreshWheel();
+}
+
+['#extraNames', '#usePTI', '#onlyPresent', '#wheelList', '#wNoRepeat', '#wAssign'].forEach(s => {
+  $(s).addEventListener('input', () => { if (!canEdit()) return; syncSpinUI(); updatePoolInfo(); });
+  $(s).addEventListener('change', () => { if (!canEdit()) return; syncSpinUI(); updatePoolInfo(); });
+});
+$$('input[name=spinMode], input[name=wSrc]').forEach(r => r.addEventListener('change', () => { if (!canEdit()) return; syncSpinUI(); updatePoolInfo(); }));
+
+function renderSpinLog() {
+  $('#spinLog').innerHTML = spinResults.length
+    ? spinResults.map(r => `<li>${esc(r)}</li>`).join('')
+    : '<li class="muted" style="list-style:none;margin-left:-22px">Belum ada hasil.</li>';
+}
+$('#btnCopyLog').onclick = () => {
+  if (!spinResults.length) return toast('Belum ada hasil');
+  copyText('HASIL SPIN\n' + spinResults.map((r, i) => `${i + 1}. ${r}`).join('\n'));
+};
+$('#btnResetWheel').onclick = () => {
+  if (!canEdit()) return;
+  if (spinResults.length && !confirm('Reset roda dan hapus daftar hasil spin?')) return;
+  spinResults = []; renderSpinLog(); $('#spinBox').textContent = 'Tekan SPIN!'; updatePoolInfo();
+};
+
+function ensureGroups() {
+  if (curGroups.length) return true;
+  const total = getPool().length;
+  if (total < 2) { alert('Peserta kurang dari 2.'); return false; }
+  let n = parseInt($('#gCount').value) || 2;
+  n = Math.max(2, Math.min(n, total)); $('#gCount').value = n;
+  curGroups = Array.from({ length: n }, (_, i) => ({ name: `Kelompok ${i + 1}`, materi: '', members: [] }));
+  return true;
+}
+
+async function spinAuto() {
+  if (!canEdit()) return;
+  const items = wheelCandidates();
+  if (items.length < 2) { alert('Peserta kurang dari 2. Aktifkan daftar kelas atau tambah nama lain.'); return; }
+  if (curGroups.some(g => g.members.length) &&
+      !confirm('Draf kelompok yang tampil saat ini akan diganti hasil spin baru. Lanjutkan?')) return;
+  let n = parseInt($('#gCount').value) || 2;
+  n = Math.max(2, Math.min(n, items.length)); $('#gCount').value = n;
+  const box = $('#spinBox'), btn = $('#btnSpin');
+  btn.disabled = true; box.classList.add('spinning'); box.textContent = 'Memutar roda...';
+  const idx = await spinWheel(items, 3500);
+  box.classList.remove('spinning'); btn.disabled = false;
+  box.textContent = `🎉 Kelompok terbentuk! (roda berhenti di ${items[idx].name})`;
+  const old = curGroups;
+  const mixed = shuffle(getPool());
+  curGroups = Array.from({ length: n }, (_, i) => ({
+    name: (old[i] && old[i].name) || `Kelompok ${i + 1}`,
+    materi: (old[i] && old[i].materi) || '',
+    members: []
+  }));
+  mixed.forEach((s, i) => curGroups[i % n].members.push(labelOf(s)));
+  renderGroups();
+}
+
+async function spinIndiv() {
+  if (!canEdit()) return;
+  const items = wheelCandidates();
+  if (!items.length) { toast('Roda kosong. Tambahkan item atau reset roda.'); return; }
+  if (assignOn() && !ensureGroups()) return;
+  const box = $('#spinBox'), btn = $('#btnSpin');
+  btn.disabled = true; box.classList.add('spinning'); box.textContent = 'Memutar roda...';
+  const idx = await spinWheel(items, 3800);
+  const pick = items[idx];
+  box.classList.remove('spinning'); btn.disabled = false;
+  spinResults.push(pick.label); renderSpinLog();
+  box.textContent = `🎯 ${pick.name}`;
+  if (assignOn()) {
+    const gi = curGroups.reduce((best, g, i) => g.members.length < curGroups[best].members.length ? i : best, 0);
+    curGroups[gi].members.push(pick.label);
+    box.textContent = `🎯 ${pick.name} → ${curGroups[gi].name}`;
+    renderGroups();
+    const card = $('#groupsWrap').children[gi]; if (card) card.classList.add('flash');
+  }
+  updatePoolInfo();
+}
+$('#btnSpin').onclick = () => { if (canEdit()) (getMode() === 'indiv' ? spinIndiv() : spinAuto()); };
+
+/* ================= KELOMPOK: DRAF & KELOMPOK TERSIMPAN ================= */
+function allNames() {
+  const seen = new Set(), out = [];
+  [...cloudState.students, ...parseExtra()].forEach(s => {
+    const l = labelOf(s).toLowerCase();
+    if (!seen.has(l)) { seen.add(l); out.push(s); }
+  });
+  return out;
+}
+function unassigned() {
+  const used = new Set(curGroups.flatMap(g => g.members.map(m => m.toLowerCase())));
+  return allNames().filter(s => !used.has(labelOf(s).toLowerCase()));
+}
+
+function resolveMemberLabel(text) {
+  text = (text || '').trim();
+  if (!text) return null;
+  const lower = text.toLowerCase(), pool = allNames();
+  const hit = pool.find(x => labelOf(x).toLowerCase() === lower) || pool.find(x => x.name.toLowerCase() === lower);
+  if (hit) return labelOf(hit);
+  const p = text.split(/\s[-–,]\s|\t/), nm = (p[0] || '').trim();
+  if (!nm) return null;
+  return nm + (p[1] && p[1].trim() ? ` (${p[1].trim()})` : '');
+}
+
+function renderGroups() {
+  if (!canEdit()) return;
+  $('#availList').innerHTML = unassigned().map(s => `<option value="${esc(labelOf(s))}">`).join('');
+  $('#groupsWrap').innerHTML = curGroups.length ? curGroups.map((g, i) => `
+    <div class="gcard" style="animation-delay:${i * 60}ms">
+      <input class="gname" data-i="${i}" type="text" value="${esc(g.name)}" placeholder="Nama kelompok">
+      <input class="materi" data-i="${i}" type="text" value="${esc(g.materi)}" placeholder="Materi kelompok (opsional)">
+      <div class="ghead"><span>${g.members.length} anggota</span><button class="btn small danger" data-gact="delg" data-i="${i}">Hapus</button></div>
+      ${g.members.length ? `<div>${g.members.map((m, mi) => `
+        <div class="mrow"><span class="mname">${mi + 1}. ${esc(m)}</span>
+          <select class="mv" data-i="${i}" data-m="${mi}" title="Pindahkan ke kelompok lain"><option value="">↔</option>${curGroups.map((x, xi) => xi === i ? '' : `<option value="${xi}">${esc(x.name)}</option>`).join('')}</select>
+          <button class="xbtn" data-gact="rm" data-i="${i}" data-m="${mi}" title="Keluarkan dari kelompok">×</button>
+        </div>`).join('')}</div>`
+        : '<div class="muted tiny">Belum ada anggota.</div>'}
+      <div class="addrow"><input class="addm" data-i="${i}" list="availList" type="text" placeholder="Tambah anggota..."><button class="btn small" data-gact="add" data-i="${i}">Tambah</button></div>
+    </div>`).join('') : '<div class="empty">Belum ada draf kelompok. Tekan SPIN di atas atau "➕ Tambah Kelompok".</div>';
+}
+
+$('#groupsWrap').oninput = e => {
+  if (!canEdit()) return;
+  const i = e.target.dataset.i; if (i === undefined) return;
+  if (e.target.classList.contains('gname')) curGroups[i].name = e.target.value;
+  else if (e.target.classList.contains('materi')) curGroups[i].materi = e.target.value;
+};
+
+function afterGroupEdit(focusI) {
+  renderGroups(); updatePoolInfo();
+  if (focusI !== undefined) { const el = document.querySelector(`.addm[data-i="${focusI}"]`); if (el) el.focus(); }
+}
+function nextGroupName(list = curGroups) {
+  const used = new Set(list.map(g => g.name.trim().toLowerCase()));
+  let n = list.length + 1;
+  while (used.has(`kelompok ${n}`)) n++;
+  return `Kelompok ${n}`;
+}
+function addMemberToList(groupList, gi, text) {
+  const label = resolveMemberLabel(text);
+  if (!label) return false;
+  const holder = groupList.findIndex(g => g.members.some(m => m.toLowerCase() === label.toLowerCase()));
+  if (holder > -1) { toast(`${label} sudah ada di ${groupList[holder].name}`); return false; }
+  groupList[gi].members.push(label);
+  return true;
+}
+
+$('#btnAddGroup').onclick = () => {
+  if (!canEdit()) return;
+  curGroups.push({ name: nextGroupName(curGroups), materi: '', members: [] });
+  renderGroups();
+  const last = $('#groupsWrap').lastElementChild, inp = last && last.querySelector('.gname');
+  if (inp) { inp.focus(); inp.select(); }
+};
+$('#groupsWrap').onclick = e => {
+  if (!canEdit()) return;
+  const b = e.target.closest('[data-gact]'); if (!b) return;
+  const i = +b.dataset.i, act = b.dataset.gact;
+  if (act === 'add') { const inp = b.parentElement.querySelector('.addm'); if (addMemberToList(curGroups, i, inp.value)) afterGroupEdit(i); }
+  if (act === 'rm') { curGroups[i].members.splice(+b.dataset.m, 1); afterGroupEdit(); }
+  if (act === 'delg') {
+    const g = curGroups[i];
+    if (g.members.length && !confirm(`Hapus "${g.name}" beserta ${g.members.length} anggotanya?`)) return;
+    curGroups.splice(i, 1); afterGroupEdit();
+  }
+};
+$('#groupsWrap').onkeydown = e => {
+  if (!canEdit() || e.key !== 'Enter' || !e.target.classList.contains('addm')) return;
+  e.preventDefault();
+  const i = +e.target.dataset.i;
+  if (addMemberToList(curGroups, i, e.target.value)) afterGroupEdit(i);
+};
+$('#groupsWrap').onchange = e => {
+  if (!canEdit() || !e.target.classList.contains('mv') || e.target.value === '') return;
+  const i = +e.target.dataset.i, m = +e.target.dataset.m, to = +e.target.value;
+  const [who] = curGroups[i].members.splice(m, 1);
+  curGroups[to].members.push(who); afterGroupEdit();
+};
+
+function resetGroupCreationForm() {
+  curGroups = [];
+  spinResults = [];
+  $('#matkul').value = '';
+  $('#extraNames').value = '';
+  $('#wheelList').value = '';
+  $('#gCount').value = 4;
+  $('#spinBox').textContent = 'Tekan SPIN!';
+  renderSpinLog();
+  renderGroups();
+  updatePoolInfo();
+  loadContext();
+}
+
+$('#btnClearGroups').onclick = () => {
+  if (!canEdit()) return;
+  if (!curGroups.length && !$('#matkul').value.trim()) return toast('Form sudah kosong');
+  if (!confirm('Kosongkan seluruh form pembuatan kelompok ini?')) return;
+  resetGroupCreationForm();
+  toast('Form kelompok dikosongkan');
+};
+
+function buildGroupsText(groups, date, matkul) {
+  const out = ['PEMBAGIAN KELOMPOK', `Mata Kuliah : ${matkul || 'Belum Ada Mata Kuliah'}`];
+  if (date) out.push(`Tanggal     : ${fmtDate(date)}`);
+  out.push('');
+  groups.forEach(g => {
+    out.push(`${g.name}${g.materi ? ' — Materi: ' + g.materi : ''}`);
+    g.members.forEach((m, i) => out.push(`${i + 1}. ${m}`));
+    out.push('');
+  });
+  return out.join('\n').trim();
+}
+$('#btnCopyGroups').onclick = () => {
+  if (!curGroups.length) return toast('Belum ada draf kelompok');
+  copyText(buildGroupsText(curGroups, $('#date').value, $('#matkul').value.trim()));
+};
+
+$('#btnSaveSet').onclick = () => {
+  if (!canEdit()) return;
+  if (!curGroups.length) return toast('Belum ada kelompok untuk disimpan. Silakan SPIN atau Tambah Kelompok dulu.');
+  const rawMatkul = $('#matkul').value.trim();
+  const matkulLabel = rawMatkul || 'Belum Ada Mata Kuliah';
+
+  const newEntry = {
+    id: uid(),
+    matkul: matkulLabel,
+    date: $('#date').value || todayStr(),
+    savedAt: Date.now(),
+    groups: JSON.parse(JSON.stringify(curGroups))
+  };
+
+  cloudState.savedGroups.unshift(newEntry);
+  pushToCloud(true);
+  refreshMatkulList();
+  renderSavedGroups();
+
+  resetGroupCreationForm();
+  toast(`Kelompok tersimpan (${matkulLabel}) & form direset ✓`);
+};
+
+function renderSavedGroups() {
+  const list = cloudState.savedGroups || [];
+  $('#totalSetsBadge').textContent = list.length;
+
+  const matkuls = [...new Set(list.map(x => x.matkul || 'Belum Ada Mata Kuliah'))];
+  const curFilter = $('#filterSetMatkul').value;
+  $('#filterSetMatkul').innerHTML = '<option value="">Semua Mata Kuliah</option>' +
+    matkuls.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
+  $('#filterSetMatkul').value = matkuls.includes(curFilter) ? curFilter : '';
+
+  const activeFilter = $('#filterSetMatkul').value;
+  const filtered = activeFilter ? list.filter(x => (x.matkul || 'Belum Ada Mata Kuliah') === activeFilter) : list;
+
+  const box = $('#setsList');
+  if (!filtered.length) {
+    box.innerHTML = '<div class="empty">Belum ada hasil pembagian kelompok yang tersimpan.</div>';
+    return;
+  }
+
+  if (isMhs()) {
+    box.innerHTML = filtered.map(s => `
+      <div class="setbox">
+        <div class="row between wrap gap">
+          <div>
+            <h4 style="margin:0;font-size:1.05rem;color:var(--primary)">📘 ${esc(s.matkul || 'Belum Ada Mata Kuliah')}</h4>
+            <div class="nim">Dibagikan pada ${fmtDate(s.date)}</div>
+          </div>
+          <button class="btn small" data-sact="copy" data-sid="${s.id}">Salin Daftar</button>
+        </div>
+        <div class="mhs-grp-grid">
+          ${s.groups.map(g => `
+            <div class="mhs-grp-box">
+              <h5>${esc(g.name)}</h5>
+              ${g.materi ? `<div class="materi-tag">Materi: ${esc(g.materi)}</div>` : ''}
+              ${g.members.length
+                ? `<ol>${g.members.map(m => `<li>${esc(m)}</li>`).join('')}</ol>`
+                : '<div class="muted tiny">Belum ada anggota</div>'}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  } else {
+    box.innerHTML = filtered.map(s => {
+      const usedSet = new Set(s.groups.flatMap(g => g.members.map(m => m.toLowerCase())));
+      const availForSet = allNames().filter(st => !usedSet.has(labelOf(st).toLowerCase()));
+      const dlId = `dl-set-${s.id}`;
+      return `
+      <div class="setbox" data-sid="${s.id}">
+        <div class="set-mk-bar">
+          <label>📘 Mata Kuliah:</label>
+          <input class="edit-set-matkul" type="text" list="matkulList" value="${esc(s.matkul === 'Belum Ada Mata Kuliah' ? '' : s.matkul)}" placeholder="Belum Ada Mata Kuliah (ketik untuk mengisi/mengubah)">
+          <button class="btn small" data-sact="addgrp" data-sid="${s.id}">➕ Kelompok</button>
+          <button class="btn small" data-sact="copy" data-sid="${s.id}">Salin</button>
+          <button class="btn small danger" data-sact="del" data-sid="${s.id}">Hapus</button>
+        </div>
+        <div class="nim">${s.groups.length} kelompok • Tanggal: ${fmtDate(s.date)}</div>
+        <datalist id="${dlId}">${availForSet.map(st => `<option value="${esc(labelOf(st))}">`).join('')}</datalist>
+        <details open>
+          <summary>✏️ Edit kelompok, materi &amp; pindah/tambah anggota</summary>
+          ${s.groups.map((g, gi) => `
+            <div class="sgrp" data-gi="${gi}">
+              <div class="sgrp-head">
+                <input class="sgname" data-gi="${gi}" type="text" value="${esc(g.name)}" placeholder="Nama kelompok">
+                <input class="sgmateri" data-gi="${gi}" type="text" value="${esc(g.materi)}" placeholder="Materi kelompok">
+                <button class="btn small danger" data-sact="delgrp" data-sid="${s.id}" data-gi="${gi}" title="Hapus kelompok ini">Hapus</button>
+              </div>
+              <div class="smembers">
+                ${g.members.length ? g.members.map((m, mi) => `
+                  <div class="mrow">
+                    <span class="mname">${mi + 1}. ${esc(m)}</span>
+                    <select class="smv" data-gi="${gi}" data-mi="${mi}" title="Pindahkan ke kelompok lain">
+                      <option value="">↔ Pindah</option>
+                      ${s.groups.map((x, xi) => xi === gi ? '' : `<option value="${xi}">${esc(x.name)}</option>`).join('')}
+                    </select>
+                    <button class="xbtn" data-sact="rmmem" data-sid="${s.id}" data-gi="${gi}" data-mi="${mi}" title="Keluarkan anggota">×</button>
+                  </div>
+                `).join('') : '<div class="muted tiny">Belum ada anggota.</div>'}
+              </div>
+              <div class="addrow">
+                <input class="saddm" data-gi="${gi}" list="${dlId}" type="text" placeholder="Tambah anggota ke ${esc(g.name)}...">
+                <button class="btn small" data-sact="addmem" data-sid="${s.id}" data-gi="${gi}">Tambah</button>
+              </div>
+            </div>`).join('')}
+        </details>
+      </div>`;
+    }).join('');
+  }
+}
+
+$('#filterSetMatkul').onchange = renderSavedGroups;
+
+$('#setsList').oninput = e => {
+  if (!canEdit()) return;
+  const box = e.target.closest('.setbox'); if (!box) return;
+  const s = cloudState.savedGroups.find(x => x.id === box.dataset.sid); if (!s) return;
+
+  if (e.target.classList.contains('edit-set-matkul')) {
+    s.matkul = e.target.value.trim() || 'Belum Ada Mata Kuliah';
+    refreshMatkulList();
+    pushToCloud();
+    return;
+  }
+  const gi = e.target.dataset.gi;
+  if (gi !== undefined) {
+    if (e.target.classList.contains('sgname')) {
+      s.groups[gi].name = e.target.value;
+      pushToCloud();
+    } else if (e.target.classList.contains('sgmateri')) {
+      s.groups[gi].materi = e.target.value;
+      pushToCloud();
+    }
+  }
+};
+
+$('#setsList').onchange = e => {
+  if (!canEdit()) return;
+  if (!e.target.classList.contains('smv') || e.target.value === '') return;
+  const box = e.target.closest('.setbox'); if (!box) return;
+  const s = cloudState.savedGroups.find(x => x.id === box.dataset.sid); if (!s) return;
+  const gi = +e.target.dataset.gi;
+  const mi = +e.target.dataset.mi;
+  const to = +e.target.value;
+  const [who] = s.groups[gi].members.splice(mi, 1);
+  s.groups[to].members.push(who);
+  pushToCloud(true);
+  renderSavedGroups();
+  toast(`${who} dipindah ke ${s.groups[to].name} ✓`);
+};
+
+$('#setsList').onkeydown = e => {
+  if (!canEdit() || e.key !== 'Enter' || !e.target.classList.contains('saddm')) return;
+  e.preventDefault();
+  const box = e.target.closest('.setbox'); if (!box) return;
+  const s = cloudState.savedGroups.find(x => x.id === box.dataset.sid); if (!s) return;
+  const gi = +e.target.dataset.gi;
+  if (addMemberToList(s.groups, gi, e.target.value)) {
+    pushToCloud(true);
+    renderSavedGroups();
+    toast('Anggota ditambahkan ✓');
+  }
+};
+
+$('#setsList').onclick = e => {
+  const act = e.target.dataset.sact; if (!act) return;
+  const sid = e.target.dataset.sid;
+  const s = cloudState.savedGroups.find(x => x.id === sid); if (!s) return;
+
+  if (act === 'copy') copyText(buildGroupsText(s.groups, s.date, s.matkul));
+  if (!canEdit()) return;
+
+  if (act === 'del') {
+    if (!confirm(`Hapus pembagian kelompok untuk "${s.matkul}"?`)) return;
+    cloudState.savedGroups = cloudState.savedGroups.filter(x => x.id !== sid);
+    pushToCloud(true);
+    renderSavedGroups();
+    refreshMatkulList();
+  }
+  if (act === 'addgrp') {
+    s.groups.push({ name: nextGroupName(s.groups), materi: '', members: [] });
+    pushToCloud(true);
+    renderSavedGroups();
+    toast('Kelompok baru ditambahkan ✓');
+  }
+  if (act === 'delgrp') {
+    const gi = +e.target.dataset.gi;
+    const g = s.groups[gi];
+    if (g.members.length && !confirm(`Hapus "${g.name}" beserta ${g.members.length} anggotanya?`)) return;
+    s.groups.splice(gi, 1);
+    pushToCloud(true);
+    renderSavedGroups();
+    toast('Kelompok dihapus');
+  }
+  if (act === 'rmmem') {
+    const gi = +e.target.dataset.gi;
+    const mi = +e.target.dataset.mi;
+    s.groups[gi].members.splice(mi, 1);
+    pushToCloud(true);
+    renderSavedGroups();
+    toast('Anggota dikeluarkan');
+  }
+  if (act === 'addmem') {
+    const gi = +e.target.dataset.gi;
+    const inp = e.target.parentElement.querySelector('.saddm');
+    if (addMemberToList(s.groups, gi, inp.value)) {
+      pushToCloud(true);
+      renderSavedGroups();
+      toast('Anggota ditambahkan ✓');
+    }
+  }
+};
+
+/* ================= JADWAL ================= */
+let editJadwalId = null;
+$('#jHari').innerHTML = HARI.map(h => `<option>${h}</option>`).join('');
+const todayHari = () => ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][new Date().getDay()];
+const jamText = j => j.mulai && j.selesai ? `${j.mulai} - ${j.selesai}` : (j.mulai || j.selesai || '-');
+
+function resetJadwalForm() {
+  editJadwalId = null;
+  $('#jMatkul').value = ''; $('#jMulai').value = ''; $('#jSelesai').value = ''; $('#jDosen').value = '';
+  $('#jFormTitle').textContent = 'Tambah Jadwal'; $('#btnSaveJadwal').textContent = 'Tambah Jadwal';
+  $('#btnCancelJadwal').classList.add('hidden');
+}
+$('#btnSaveJadwal').onclick = () => {
+  if (!canEdit()) return;
+  const matkul = $('#jMatkul').value.trim();
+  if (!matkul) { toast('Nama mata kuliah wajib diisi'); return; }
+  const data = { hari: $('#jHari').value, matkul, mulai: $('#jMulai').value, selesai: $('#jSelesai').value, dosen: $('#jDosen').value.trim() };
+  if (editJadwalId) { Object.assign(cloudState.jadwal.find(j => j.id === editJadwalId) || {}, data); toast('Jadwal diperbarui ✓'); }
+  else { cloudState.jadwal.push({ id: uid(), ...data }); toast('Jadwal ditambahkan ✓'); }
+  pushToCloud(true); resetJadwalForm(); renderJadwal(); refreshMatkulList();
+};
+$('#btnCancelJadwal').onclick = resetJadwalForm;
+
+function renderJadwal() {
+  const wrap = $('#jadwalList');
+  const list = cloudState.jadwal;
+  if (!list.length) { wrap.innerHTML = '<div class="empty">Belum ada jadwal.</div>'; return; }
+  const today = todayHari();
+  wrap.innerHTML = HARI.map(h => {
+    const rows = list.filter(j => j.hari === h).sort((a, b) => (a.mulai || '').localeCompare(b.mulai || ''));
+    if (!rows.length) return '';
+    return `<div class="day-block"><div class="day-h ${h === today ? 'today' : ''}">${h}${h === today ? ' • Hari ini' : ''}</div>` +
+      rows.map(j => `
+        <div class="item" data-jid="${j.id}">
+          <div><span class="nm">${esc(j.matkul)}</span>
+            <div class="nim">🕒 ${esc(jamText(j))} • 👨‍🏫 ${esc(j.dosen || '-')}</div></div>
+          <div class="row gap wrap only-edit">
+            <button class="btn small" data-jact="use">Pakai</button>
+            <button class="btn small" data-jact="edit">Edit</button>
+            <button class="btn small danger" data-jact="del">Hapus</button>
+          </div>
+        </div>`).join('') + '</div>';
+  }).join('');
+}
+$('#jadwalList').onclick = e => {
+  if (!canEdit()) return;
+  const act = e.target.dataset.jact; if (!act) return;
+  const id = e.target.closest('.item').dataset.jid;
+  const j = cloudState.jadwal.find(x => x.id === id); if (!j) return;
+  if (act === 'use') { openContext($('#date').value, j.matkul); goTab('absen'); toast(`Mata kuliah: ${j.matkul}`); }
+  if (act === 'edit') {
+    editJadwalId = id;
+    $('#jHari').value = j.hari; $('#jMatkul').value = j.matkul; $('#jMulai').value = j.mulai || '';
+    $('#jSelesai').value = j.selesai || ''; $('#jDosen').value = j.dosen || '';
+    $('#jFormTitle').textContent = 'Edit Jadwal'; $('#btnSaveJadwal').textContent = 'Simpan Perubahan';
+    $('#btnCancelJadwal').classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (act === 'del' && confirm(`Hapus jadwal ${j.matkul} (${j.hari})?`)) {
+    cloudState.jadwal = cloudState.jadwal.filter(x => x.id !== id); pushToCloud(true);
+    if (editJadwalId === id) resetJadwalForm();
+    renderJadwal(); refreshMatkulList();
+  }
+};
+$('#btnCopyJadwal').onclick = () => {
+  if (!cloudState.jadwal.length) return toast('Belum ada jadwal');
+  const out = ['JADWAL KULIAH', ''];
+  HARI.forEach(h => {
+    const rows = cloudState.jadwal.filter(j => j.hari === h).sort((a, b) => (a.mulai || '').localeCompare(b.mulai || ''));
+    if (!rows.length) return;
+    out.push(h.toUpperCase());
+    rows.forEach((j, i) => out.push(`${i + 1}. ${j.matkul} | ${jamText(j)} | ${j.dosen || '-'}`));
+    out.push('');
+  });
+  copyText(out.join('\n').trim());
+};
+
+/* ================= TUGAS ================= */
+let tForm = { id: null, files: [] };
+
+function compressImageToDataURL(file, maxW = 800, quality = 0.72) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * (maxW / w)); w = maxW; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = ev.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPending() {
+  $('#tPreview').innerHTML = tForm.files.map((f, i) => `
+    <div class="pfile" title="${esc(f.name)}">
+      <img src="${f.dataUrl}" alt="">
+      <button type="button" data-rm="${i}">×</button>
+    </div>`).join('');
+}
+
+$('#tFiles').onchange = async e => {
+  if (!canEdit()) return;
+  for (const f of e.target.files) {
+    if (!f.type.startsWith('image/')) { toast(`"${f.name}" harus berupa gambar`); continue; }
+    try {
+      const dataUrl = await compressImageToDataURL(f);
+      tForm.files.push({ name: f.name, dataUrl });
+    } catch {
+      toast(`Gagal memproses gambar "${f.name}"`);
+    }
+  }
+  e.target.value = ''; renderPending();
+};
+$('#tPreview').onclick = e => {
+  if (!canEdit()) return;
+  const i = e.target.dataset.rm; if (i === undefined) return;
+  tForm.files.splice(i, 1); renderPending();
+};
+function resetTugasForm() {
+  tForm = { id: null, files: [] };
+  $('#tMatkul').value = ''; $('#tDeadline').value = ''; $('#tJudul').value = ''; $('#tDesc').value = '';
+  $('#tFormTitle').textContent = 'Tambah Tugas'; $('#btnSaveTugas').textContent = 'Tambah Tugas';
+  $('#btnCancelTugas').classList.add('hidden'); renderPending();
+}
+$('#btnCancelTugas').onclick = resetTugasForm;
+
+$('#btnSaveTugas').onclick = () => {
+  if (!canEdit()) return;
+  const judul = $('#tJudul').value.trim();
+  if (!judul) { toast('Judul tugas wajib diisi'); return; }
+  const data = {
+    matkul: $('#tMatkul').value.trim(),
+    judul,
+    desc: $('#tDesc').value.trim(),
+    deadline: $('#tDeadline').value,
+    files: [...tForm.files]
+  };
+  if (tForm.id) {
+    Object.assign(cloudState.tugas.find(t => t.id === tForm.id) || {}, data);
+    toast('Tugas diperbarui ✓');
+  } else {
+    cloudState.tugas.push({ id: uid(), done: false, created: Date.now(), ...data });
+    toast('Tugas ditambahkan ✓');
+  }
+  pushToCloud(true);
+  resetTugasForm(); renderTugas(); refreshMatkulList();
+};
+
+function deadlineChip(t, isDoneForUser) {
+  if (!t.deadline) return '';
+  const days = Math.round((new Date(t.deadline + 'T00:00:00') - new Date(todayStr() + 'T00:00:00')) / 86400000);
+  const tgl = fmtShort(t.deadline);
+  if (isDoneForUser) return `<span class="chip">⏰ ${tgl}</span>`;
+  if (days < 0) return `<span class="chip late">Terlewat ${-days} hari • ${tgl}</span>`;
+  if (days === 0) return `<span class="chip warn">Hari ini • ${tgl}</span>`;
+  if (days === 1) return `<span class="chip warn">Besok • ${tgl}</span>`;
+  return `<span class="chip ${days <= 3 ? 'warn' : ''}">${days} hari lagi • ${tgl}</span>`;
+}
+
+function renderTugas() {
+  const allTugas = cloudState.tugas;
+  const mhsDoneMap = isMhs() ? getMhsDoneMap() : {};
+  const isTugasDone = t => isMhs() ? Boolean(t.done || mhsDoneMap[t.id]) : Boolean(t.done);
+
+  const mats = [...new Set(allTugas.map(t => t.matkul || '(Tanpa mata kuliah)'))].sort();
+  const cur = $('#tFilter').value || '';
+  $('#tFilter').innerHTML = '<option value="">Semua mata kuliah</option>' + mats.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
+  $('#tFilter').value = mats.includes(cur) ? cur : '';
+  const f = $('#tFilter').value;
+  const q = ($('#tSearch') ? $('#tSearch').value : '').trim().toLowerCase();
+  const hide = $('#tHideDone').checked;
+
+  let list = allTugas.filter(t => {
+    const matMatch = !f || (t.matkul || '(Tanpa mata kuliah)') === f;
+    const hideMatch = !(hide && isTugasDone(t));
+    const searchMatch = !q ||
+      (t.judul || '').toLowerCase().includes(q) ||
+      (t.desc || '').toLowerCase().includes(q) ||
+      (t.matkul || '').toLowerCase().includes(q);
+    return matMatch && hideMatch && searchMatch;
+  });
+  list.sort((a, b) => (isTugasDone(a) - isTugasDone(b)) || ((a.deadline || '9999').localeCompare(b.deadline || '9999')) || (b.created - a.created));
+  $('#tCount').textContent = list.length;
+
+  $('#tugasList').innerHTML = list.length ? list.map(t => {
+    const doneGlobal = Boolean(t.done);
+    const donePersonal = Boolean(mhsDoneMap[t.id]);
+    const effectiveDone = isMhs() ? (doneGlobal || donePersonal) : doneGlobal;
+
+    return `
+    <div class="tcard ${effectiveDone ? 'done' : ''} ${isMhs() && effectiveDone ? 'mhs-checked' : ''}" data-tid="${t.id}">
+      <div class="row between wrap gap">
+        <h4>${esc(t.judul)}</h4>
+        <div class="row gap wrap">
+          ${t.matkul ? `<span class="chip">${esc(t.matkul)}</span>` : ''}
+          ${effectiveDone ? '<span class="chip ok">✓ Selesai</span>' : ''}
+          ${deadlineChip(t, effectiveDone)}
+        </div>
+      </div>
+      ${t.desc ? `<div class="tdesc">${esc(t.desc)}</div>` : '<div class="muted tiny">Tidak ada penjelasan.</div>'}
+      ${t.files && t.files.length ? `<div class="media-grid">${t.files.map(m =>
+        `<img src="${m.dataUrl}" alt="${esc(m.name)}" title="${esc(m.name)}">`).join('')}</div>` : ''}
+      
+      <div class="only-mhs">
+        <label class="mhs-check-wrap ${effectiveDone ? 'checked' : ''}">
+          <input type="checkbox" class="mhs-tugas-chk" data-tid="${t.id}" ${effectiveDone ? 'checked' : ''} ${doneGlobal ? 'disabled' : ''}>
+          <span>${doneGlobal ? 'Ditutup / Selesai oleh Sekretaris' : (donePersonal ? 'Sudah Dikerjakan ✓ (klik untuk batalkan)' : 'Tandai Selesai')}</span>
+        </label>
+      </div>
+
+      <div class="row gap wrap only-edit">
+        <button class="btn small" data-tact="done">${t.done ? 'Tandai belum selesai' : 'Tandai selesai'}</button>
+        <button class="btn small" data-tact="edit">Edit</button>
+        <button class="btn small danger" data-tact="del">Hapus</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">Belum ada tugas yang cocok.</div>';
+}
+$('#tSearch').oninput = renderTugas;
+$('#tFilter').onchange = renderTugas;
+$('#tHideDone').onchange = renderTugas;
+
+$('#tugasList').onchange = e => {
+  if (!e.target.classList.contains('mhs-tugas-chk')) return;
+  if (!isMhs()) return;
+  const tid = e.target.dataset.tid;
+  const nowChecked = toggleMhsTugasDone(tid);
+  renderTugas();
+  toast(nowChecked ? 'Tugas ditandai sudah selesai ✓' : 'Centang tugas dibatalkan');
+};
+
+$('#tugasList').onclick = e => {
+  if (e.target.tagName === 'IMG') {
+    $('#lightbox img').src = e.target.src; $('#lightbox').classList.remove('hidden'); return;
+  }
+  if (!canEdit()) return;
+  const act = e.target.dataset.tact; if (!act) return;
+  const id = e.target.closest('.tcard').dataset.tid;
+  const t = cloudState.tugas.find(x => x.id === id); if (!t) return;
+  if (act === 'done') { t.done = !t.done; pushToCloud(true); renderTugas(); }
+  if (act === 'edit') {
+    tForm = { id, files: (t.files || []).map(m => ({ ...m })) };
+    $('#tMatkul').value = t.matkul || ''; $('#tDeadline').value = t.deadline || ''; $('#tJudul').value = t.judul; $('#tDesc').value = t.desc || '';
+    $('#tFormTitle').textContent = 'Edit Tugas'; $('#btnSaveTugas').textContent = 'Simpan Perubahan';
+    $('#btnCancelTugas').classList.remove('hidden'); renderPending(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (act === 'del' && confirm(`Hapus tugas "${t.judul}"?`)) {
+    cloudState.tugas = cloudState.tugas.filter(x => x.id !== id); pushToCloud(true);
+    if (tForm.id === id) resetTugasForm();
+    renderTugas(); refreshMatkulList();
+  }
+};
+$('#lightbox').onclick = () => $('#lightbox').classList.add('hidden');
+
+/* ================= RIWAYAT ABSENSI & KELOMPOK (LENGKAP + EDIT LANGSUNG) ================= */
+$$('.subtab').forEach(b => b.onclick = () => {
+  $$('.subtab').forEach(x => x.classList.toggle('active', x === b));
+  $('#histAbsenPane').classList.toggle('hidden', b.dataset.h !== 'absen');
+  $('#histKelPane').classList.toggle('hidden', b.dataset.h !== 'kel');
+});
+$('#histSearchAbsen').oninput = () => renderHistory();
+$('#histSearchKel').oninput = () => renderHistory();
+
+function renderHistory() {
+  const qAbs = ($('#histSearchAbsen').value || '').trim().toLowerCase();
+  const qKel = ($('#histSearchKel').value || '').trim().toLowerCase();
+  const allKa = Object.keys(cloudState.records).sort().reverse();
+  const ka = allKa.filter(k => !qAbs || k === editingAbsenKey ||
+    (cloudState.records[k].matkul || '').toLowerCase().includes(qAbs));
+  $('#histAbsen').innerHTML = ka.length ? ka.map(k => {
+    const r = cloudState.records[k];
+    const st = r.status || {};
+    const groupBy = code => cloudState.students.filter(s => st[s.id] === code).map(s => s.name);
+    const listH = groupBy('H'), listI = groupBy('I'), listS = groupBy('S'), listA = groupBy('A');
+
+    const renderGroupList = (arr) => arr.length
+      ? `<ol class="hist-names">${arr.map(n => `<li>${esc(n)}</li>`).join('')}</ol>`
+      : '<span class="muted tiny">Tidak ada</span>';
+
+    const isEditingThis = canEdit() && editingAbsenKey === k && editingAbsenDraft;
+
+    return `
+      <div class="hist-card">
+        <div class="row between wrap gap">
+          <div>
+            <span class="nm" style="font-size:1.05rem">${esc(r.matkul)}</span>
+            <div class="nim">📅 ${fmtDate(r.date)}</div>
+          </div>
+          <div class="row gap wrap">
+            <button class="btn small only-sek" data-hact="edit-abs" data-k="${esc(k)}">${isEditingThis ? 'Tutup Edit' : '✏️ Edit'}</button>
+            <button class="btn small" data-hact="copy-abs" data-k="${esc(k)}">Salin Rekap</button>
+            <button class="btn small danger only-sek" data-hact="del-abs" data-k="${esc(k)}">Hapus</button>
+          </div>
+        </div>
+        ${isEditingThis ? `
+          <div class="hist-edit-panel">
+            <b>✏️ Edit Riwayat Absensi</b>
+            <div class="grid2">
+              <div class="field">
+                <label>Mata Kuliah</label>
+                <input type="text" id="editAbsMatkul" list="matkulList" value="${esc(editingAbsenDraft.matkul)}">
+              </div>
+              <div class="field">
+                <label>Tanggal</label>
+                <input type="date" id="editAbsDate" value="${esc(editingAbsenDraft.date)}">
+              </div>
+            </div>
+            <div class="list">
+              ${cloudState.students.map((s, idx) => `
+                <div class="hist-edit-row">
+                  <div><b>${idx + 1}. ${esc(s.name)}</b>${s.nim ? `<div class="nim">${esc(s.nim)}</div>` : ''}</div>
+                  <div class="st" data-edit-sid="${s.id}">
+                    ${Object.keys(STATUS).map(code => `<button type="button" data-s="${code}" class="${editingAbsenDraft.status[s.id] === code ? 'on' : ''}">${code}</button>`).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="field">
+              <label>Catatan</label>
+              <input type="text" id="editAbsNote" value="${esc(editingAbsenDraft.note || '')}" placeholder="Catatan pertemuan...">
+            </div>
+            <div class="row gap wrap">
+              <button class="btn primary small" data-hact="save-abs" data-k="${esc(k)}">💾 Simpan Perubahan</button>
+              <button class="btn small" data-hact="cancel-abs">Batal</button>
+            </div>
+          </div>
+        ` : `
+          <div class="hist-summary-grid">
+            <div class="hist-stat h"><b>✅ Hadir (${listH.length})</b>${renderGroupList(listH)}</div>
+            <div class="hist-stat i"><b>🔵 Izin (${listI.length})</b>${renderGroupList(listI)}</div>
+            <div class="hist-stat s"><b>🟡 Sakit (${listS.length})</b>${renderGroupList(listS)}</div>
+            <div class="hist-stat a"><b>🔴 Alpha (${listA.length})</b>${renderGroupList(listA)}</div>
+          </div>
+          ${r.note ? `<div class="tiny muted">📝 <b>Catatan:</b> ${esc(r.note)}</div>` : ''}
+        `}
+      </div>`;
+  }).join('') : `<div class="empty">${allKa.length ? 'Tidak ada riwayat absensi yang cocok dengan pencarian.' : 'Belum ada riwayat absensi tersimpan.'}</div>`;
+
+  const allKk = cloudState.savedGroups || [];
+  const kk = allKk.filter(g => !qKel || g.id === editingKelId ||
+    (g.matkul || 'Belum Ada Mata Kuliah').toLowerCase().includes(qKel));
+  $('#histKel').innerHTML = kk.length ? kk.map(g => {
+    const isEditingThis = canEdit() && editingKelId === g.id && editingKelDraft;
+    const usedSet = isEditingThis ? new Set(editingKelDraft.groups.flatMap(grp => grp.members.map(m => m.toLowerCase()))) : null;
+    const availForEdit = isEditingThis ? allNames().filter(st => !usedSet.has(labelOf(st).toLowerCase())) : [];
+    const dlId = `dl-hist-${g.id}`;
+
+    return `
+      <div class="hist-card">
+        <div class="row between wrap gap">
+          <div>
+            <span class="nm" style="font-size:1.05rem">📘 ${esc(g.matkul || 'Belum Ada Mata Kuliah')}</span>
+            <div class="nim">📅 ${fmtDate(g.date)} • ${g.groups.length} kelompok</div>
+          </div>
+          <div class="row gap wrap">
+            <button class="btn small only-sek" data-hact="edit-kel" data-id="${esc(g.id)}">${isEditingThis ? 'Tutup Edit' : '✏️ Edit'}</button>
+            <button class="btn small" data-hact="copy-kel" data-id="${esc(g.id)}">Salin Kelompok</button>
+            <button class="btn small danger only-sek" data-hact="del-kel" data-id="${esc(g.id)}">Hapus</button>
+          </div>
+        </div>
+
+        ${isEditingThis ? `
+          <div class="hist-edit-panel">
+            <b>✏️ Edit Riwayat Kelompok</b>
+            <div class="grid2">
+              <div class="field">
+                <label>Mata Kuliah</label>
+                <input type="text" id="editKelMatkul" list="matkulList" value="${esc(editingKelDraft.matkul === 'Belum Ada Mata Kuliah' ? '' : editingKelDraft.matkul)}" placeholder="Nama mata kuliah">
+              </div>
+              <div class="field">
+                <label>Tanggal</label>
+                <input type="date" id="editKelDate" value="${esc(editingKelDraft.date || todayStr())}">
+              </div>
+            </div>
+            <datalist id="${dlId}">${availForEdit.map(st => `<option value="${esc(labelOf(st))}">`).join('')}</datalist>
+            <div class="row gap wrap">
+              <button class="btn small" data-hact="kel-addgrp">➕ Tambah Kelompok</button>
+            </div>
+            ${editingKelDraft.groups.map((grp, gi) => `
+              <div class="sgrp">
+                <div class="sgrp-head">
+                  <input class="hkel-gname" data-gi="${gi}" type="text" value="${esc(grp.name)}" placeholder="Nama kelompok">
+                  <input class="hkel-gmateri" data-gi="${gi}" type="text" value="${esc(grp.materi)}" placeholder="Materi kelompok">
+                  <button class="btn small danger" data-hact="kel-delgrp" data-gi="${gi}">Hapus</button>
+                </div>
+                <div class="smembers">
+                  ${grp.members.length ? grp.members.map((m, mi) => `
+                    <div class="mrow">
+                      <span class="mname">${mi + 1}. ${esc(m)}</span>
+                      <select class="hkel-mv" data-gi="${gi}" data-mi="${mi}" title="Pindahkan ke kelompok lain">
+                        <option value="">↔ Pindah</option>
+                        ${editingKelDraft.groups.map((x, xi) => xi === gi ? '' : `<option value="${xi}">${esc(x.name)}</option>`).join('')}
+                      </select>
+                      <button class="xbtn" data-hact="kel-rmmem" data-gi="${gi}" data-mi="${mi}" title="Keluarkan">×</button>
+                    </div>
+                  `).join('') : '<div class="muted tiny">Belum ada anggota.</div>'}
+                </div>
+                <div class="addrow">
+                  <input class="hkel-addm" data-gi="${gi}" list="${dlId}" type="text" placeholder="Tambah anggota ke ${esc(grp.name)}...">
+                  <button class="btn small" data-hact="kel-addmem" data-gi="${gi}">Tambah</button>
+                </div>
+              </div>
+            `).join('')}
+            <div class="row gap wrap">
+              <button class="btn primary small" data-hact="save-kel" data-id="${esc(g.id)}">💾 Simpan Perubahan</button>
+              <button class="btn small" data-hact="cancel-kel">Batal</button>
+            </div>
+          </div>
+        ` : `
+          <div class="mhs-grp-grid">
+            ${g.groups.map(grp => `
+              <div class="mhs-grp-box">
+                <h5>${esc(grp.name)}</h5>
+                ${grp.materi ? `<div class="materi-tag">Materi: ${esc(grp.materi)}</div>` : ''}
+                ${grp.members.length
+                  ? `<ol>${grp.members.map(m => `<li>${esc(m)}</li>`).join('')}</ol>`
+                  : '<div class="muted tiny">Belum ada anggota</div>'}
+              </div>
+            `).join('')}
+          </div>
+        `}
+      </div>`;
+  }).join('') : `<div class="empty">${allKk.length ? 'Tidak ada riwayat kelompok yang cocok dengan pencarian.' : 'Belum ada riwayat kelompok.'}</div>`;
+}
+
+$('#tab-riwayat').oninput = e => {
+  if (!canEdit()) return;
+  if (editingAbsenDraft) {
+    if (e.target.id === 'editAbsMatkul') editingAbsenDraft.matkul = e.target.value;
+    if (e.target.id === 'editAbsDate') editingAbsenDraft.date = e.target.value;
+    if (e.target.id === 'editAbsNote') editingAbsenDraft.note = e.target.value;
+  }
+  if (editingKelDraft) {
+    if (e.target.id === 'editKelMatkul') editingKelDraft.matkul = e.target.value;
+    if (e.target.id === 'editKelDate') editingKelDraft.date = e.target.value;
+    const gi = e.target.dataset.gi;
+    if (gi !== undefined) {
+      if (e.target.classList.contains('hkel-gname')) editingKelDraft.groups[+gi].name = e.target.value;
+      if (e.target.classList.contains('hkel-gmateri')) editingKelDraft.groups[+gi].materi = e.target.value;
+    }
+  }
+};
+
+$('#tab-riwayat').onchange = e => {
+  if (!canEdit() || !editingKelDraft) return;
+  if (e.target.classList.contains('hkel-mv') && e.target.value !== '') {
+    const gi = +e.target.dataset.gi;
+    const mi = +e.target.dataset.mi;
+    const to = +e.target.value;
+    const [who] = editingKelDraft.groups[gi].members.splice(mi, 1);
+    editingKelDraft.groups[to].members.push(who);
+    renderHistory();
+  }
+};
+
+$('#tab-riwayat').onkeydown = e => {
+  if (!canEdit() || !editingKelDraft) return;
+  if (e.key === 'Enter' && e.target.classList.contains('hkel-addm')) {
+    e.preventDefault();
+    const gi = +e.target.dataset.gi;
+    if (addMemberToList(editingKelDraft.groups, gi, e.target.value)) {
+      renderHistory();
+    }
+  }
+};
+
+$('#tab-riwayat').onclick = e => {
+  const stBtn = e.target.closest('[data-edit-sid] button[data-s]');
+  if (stBtn && canEdit() && editingAbsenDraft) {
+    const sid = stBtn.parentElement.dataset.editSid;
+    editingAbsenDraft.status[sid] = stBtn.dataset.s;
+    renderHistory();
+    return;
+  }
+
+  const act = e.target.dataset.hact; if (!act) return;
+  const k = e.target.dataset.k;
+  const id = e.target.dataset.id;
+
+  if (act === 'copy-abs') { const r = cloudState.records[k]; if (r) copyText(buildRekapFrom(r)); return; }
+  if (act === 'copy-kel') { const g = cloudState.savedGroups.find(x => x.id === id); if (g) copyText(buildGroupsText(g.groups, g.date, g.matkul)); return; }
+
+  if (!canEdit()) return;
+
+  // === EDIT RIWAYAT ABSEN ===
+  if (act === 'edit-abs') {
+    if (editingAbsenKey === k) {
+      editingAbsenKey = null; editingAbsenDraft = null;
+    } else {
+      const r = cloudState.records[k]; if (!r) return;
+      editingAbsenKey = k;
+      editingAbsenDraft = {
+        date: r.date,
+        matkul: r.matkul,
+        status: { ...(r.status || {}) },
+        note: r.note || ''
+      };
+    }
+    renderHistory();
+  }
+  if (act === 'cancel-abs') {
+    editingAbsenKey = null; editingAbsenDraft = null;
+    renderHistory();
+  }
+  if (act === 'save-abs') {
+    if (!editingAbsenDraft) return;
+    const newMatkul = (editingAbsenDraft.matkul || '').trim();
+    const newDate = editingAbsenDraft.date;
+    if (!newMatkul) { toast('Mata kuliah wajib diisi'); return; }
+    if (!newDate) { toast('Tanggal wajib diisi'); return; }
+
+    const newKey = ctxKey(newDate, newMatkul);
+    if (newKey !== k) delete cloudState.records[k];
+    cloudState.records[newKey] = {
+      date: newDate,
+      matkul: newMatkul,
+      status: { ...editingAbsenDraft.status },
+      note: editingAbsenDraft.note || ''
+    };
+    editingAbsenKey = null; editingAbsenDraft = null;
+    pushToCloud(true);
+    refreshMatkulList();
+    loadContext();
+    renderHistory();
+    toast('Perubahan riwayat absen disimpan ✓');
+  }
+  if (act === 'del-abs' && confirm('Hapus riwayat absensi pertemuan ini?')) {
+    delete cloudState.records[k];
+    if (editingAbsenKey === k) { editingAbsenKey = null; editingAbsenDraft = null; }
+    pushToCloud(true);
+    renderHistory(); loadContext(); refreshMatkulList();
+  }
+
+  // === EDIT RIWAYAT KELOMPOK ===
+  if (act === 'edit-kel') {
+    if (editingKelId === id) {
+      editingKelId = null; editingKelDraft = null;
+    } else {
+      const g = cloudState.savedGroups.find(x => x.id === id); if (!g) return;
+      editingKelId = id;
+      editingKelDraft = JSON.parse(JSON.stringify(g));
+    }
+    renderHistory();
+  }
+  if (act === 'cancel-kel') {
+    editingKelId = null; editingKelDraft = null;
+    renderHistory();
+  }
+  if (act === 'kel-addgrp' && editingKelDraft) {
+    editingKelDraft.groups.push({ name: nextGroupName(editingKelDraft.groups), materi: '', members: [] });
+    renderHistory();
+  }
+  if (act === 'kel-delgrp' && editingKelDraft) {
+    const gi = +e.target.dataset.gi;
+    editingKelDraft.groups.splice(gi, 1);
+    renderHistory();
+  }
+  if (act === 'kel-rmmem' && editingKelDraft) {
+    const gi = +e.target.dataset.gi;
+    const mi = +e.target.dataset.mi;
+    editingKelDraft.groups[gi].members.splice(mi, 1);
+    renderHistory();
+  }
+  if (act === 'kel-addmem' && editingKelDraft) {
+    const gi = +e.target.dataset.gi;
+    const inp = e.target.parentElement.querySelector('.hkel-addm');
+    if (addMemberToList(editingKelDraft.groups, gi, inp.value)) {
+      renderHistory();
+    }
+  }
+  if (act === 'save-kel' && editingKelDraft) {
+    const target = cloudState.savedGroups.find(x => x.id === id);
+    if (target) {
+      target.matkul = (editingKelDraft.matkul || '').trim() || 'Belum Ada Mata Kuliah';
+      target.date = editingKelDraft.date || target.date;
+      target.groups = editingKelDraft.groups;
+    }
+    editingKelId = null; editingKelDraft = null;
+    pushToCloud(true);
+    refreshMatkulList();
+    renderSavedGroups();
+    renderHistory();
+    toast('Perubahan riwayat kelompok disimpan ✓');
+  }
+  if (act === 'del-kel' && confirm('Hapus riwayat kelompok ini?')) {
+    cloudState.savedGroups = cloudState.savedGroups.filter(x => x.id !== id);
+    if (editingKelId === id) { editingKelId = null; editingKelDraft = null; }
+    pushToCloud(true);
+    renderHistory(); renderSavedGroups(); refreshMatkulList();
+  }
+};
+
+/* ================= PENGATURAN: GANTI SANDI ================= */
+$('#btnChangeCode').onclick = () => {
+  if (!canEdit()) return;
+  const o = $('#codeOld').value, n = $('#codeNew').value, n2 = $('#codeNew2').value, msg = $('#codeMsg');
+  msg.className = 'form-err';
+  if (o !== getCode()) { msg.textContent = 'Sandi lama salah.'; return; }
+  if (n.length < 4) { msg.textContent = 'Sandi baru minimal 4 karakter.'; return; }
+  if (n !== n2) { msg.textContent = 'Ulangi sandi baru tidak sama.'; return; }
+  if (n === o) { msg.textContent = 'Sandi baru harus berbeda dari sandi lama.'; return; }
+
+  cloudState.secretCode = n;
+  pushToCloud(true);
+  $('#codeOld').value = ''; $('#codeNew').value = ''; $('#codeNew2').value = '';
+  msg.className = 'form-ok'; msg.textContent = 'Sandi berhasil diganti & tersimpan di cloud ✓';
+  toast('Sandi berhasil diganti ✓');
+};
+
+/* ================= INIT ================= */
+let inited = false;
+async function initApp() {
+  if (!inited) {
+    $('#date').value = todayStr();
+    syncSpinUI();
+    inited = true;
+  }
+  await pullFromCloud(false);
+  refreshAllViews(true);
+}
+applySession();
+</script>
+</body>
+</html>
