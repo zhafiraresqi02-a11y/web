@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CLASSORA</title>
+<title>Study Group</title>
 <style>
 :root{
   --bg:#f4f6fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
@@ -97,7 +97,7 @@ details textarea{margin:10px 0}
 /* status buttons */
 .st{display:flex;gap:4px}
 .st button{border:1.5px solid var(--line);background:#fff;border-radius:8px;width:38px;height:34px;
-  font-weight:700;cursor:pointer;color:var(--muted)}
+  font-weight:700;cursor:pointer;color:var(--muted);touch-action:manipulation;user-select:none}
 .st button.on[data-s=H]{background:var(--ok);border-color:var(--ok);color:#fff}
 .st button.on[data-s=I]{background:var(--izin);border-color:var(--izin);color:#fff}
 .st button.on[data-s=S]{background:var(--sakit);border-color:var(--sakit);color:#fff}
@@ -130,8 +130,8 @@ details textarea{margin:10px 0}
 .mrow .mname{flex:1;min-width:0;word-break:break-word}
 .mrow select{width:auto;padding:3px 4px;font-size:.78rem}
 .xbtn{border:none;background:#fee2e2;color:#991b1b;border-radius:99px;width:22px;height:22px;cursor:pointer;font-weight:700;line-height:1;flex:none}
-.gcard .addrow{display:flex;gap:6px}
-.gcard .addrow input{padding:7px 10px;font-size:.85rem;font-weight:400}
+.gcard .addrow,.sgrp .addrow{display:flex;gap:6px}
+.gcard .addrow input,.sgrp .addrow input{padding:7px 10px;font-size:.85rem;font-weight:400}
 .gcard.flash{animation:flashcard 1.4s ease}
 @keyframes flashcard{0%{box-shadow:0 0 0 0 rgba(79,70,229,.6);background:#eef2ff;transform:scale(1.04)}100%{box-shadow:0 0 0 14px rgba(79,70,229,0);background:#fff;transform:none}}
 
@@ -140,16 +140,21 @@ details textarea{margin:10px 0}
 .set-mk-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#eef2ff;padding:8px 10px;border-radius:10px;border:1px solid #c7d2fe}
 .set-mk-bar label{font-size:.78rem;font-weight:700;color:var(--primary);white-space:nowrap}
 .set-mk-bar input{padding:6px 10px;font-size:.88rem;font-weight:600;flex:1;min-width:160px}
-.sgrp{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin:8px 0 4px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:10px}
-.sgrp .smembers{grid-column:1/-1;font-size:.85rem;color:var(--text);line-height:1.5}
+.sgrp{display:flex;flex-direction:column;gap:8px;margin:8px 0 4px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:10px}
+.sgrp-head{display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center}
+.sgrp .smembers{font-size:.86rem;color:var(--text);line-height:1.5;display:flex;flex-direction:column;gap:3px}
 .sgrp input{font-size:.88rem;padding:7px 10px}
 
-/* tampilan mahasiswa untuk kelompok */
+/* tampilan grid kelompok lengkap (riwayat & mahasiswa) */
 .mhs-grp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:4px}
 .mhs-grp-box{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
 .mhs-grp-box h5{margin:0 0 4px;font-size:.95rem;color:var(--primary)}
 .mhs-grp-box .materi-tag{font-size:.8rem;color:var(--muted);margin-bottom:6px;font-style:italic}
 .mhs-grp-box ol{margin:0;padding-left:18px;font-size:.88rem;line-height:1.55}
+
+/* editor inline di tab riwayat */
+.hist-edit-panel{margin-top:8px;padding:12px;border-radius:12px;border:1.5px dashed #b88b49;background:#fffdf8;display:flex;flex-direction:column;gap:10px}
+.hist-edit-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;background:#fff;border:1px solid var(--line);border-radius:9px;flex-wrap:wrap}
 
 /* sumber nama spin */
 .source-box{border:1.5px dashed #c7d2fe;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:#fafbff}
@@ -163,9 +168,15 @@ details textarea{margin:10px 0}
 .day-h.today{background:#eef2ff;border-radius:8px;padding:4px 10px}
 
 /* tugas */
-.tcard{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
-.tcard.done{opacity:.7}
+.tcard{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:opacity .2s,border-color .2s,background .2s}
+.tcard.done{opacity:.72;background:#f8fafc}
+.tcard.mhs-checked{border-color:#86efac;background:#f0fdf4}
+.tcard.mhs-checked h4{text-decoration:line-through;color:var(--muted)}
 .tcard h4{margin:0;font-size:1rem}
+.mhs-check-wrap{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:10px;border:1.5px solid #dbe4ee;background:#f8fbff;cursor:pointer;font-size:.9rem;font-weight:650;color:#1e3a5f;user-select:none;width:fit-content}
+.mhs-check-wrap:hover{background:#eef6ff;border-color:#93c5fd}
+.mhs-check-wrap input[type=checkbox]{width:18px;height:18px;accent-color:var(--ok);cursor:pointer;margin:0}
+.mhs-check-wrap.checked{background:#dcfce7;border-color:#86efac;color:#166534}
 .chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.75rem;font-weight:700;background:#eef2ff;color:var(--primary)}
 .chip.warn{background:#fef3c7;color:#92400e}
 .chip.late{background:#fee2e2;color:#991b1b}
@@ -197,14 +208,14 @@ details textarea{margin:10px 0}
   padding:10px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:.25s;font-size:.9rem;z-index:99}
 .toast.show{opacity:1;transform:translateX(-50%)}
 
-/* ===== ANIMASI TOMBOL ===== */
-.btn,.tab,.subtab,.st button,.role span{transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background .2s,color .2s,border-color .2s}
+/* ===== ANIMASI TOMBOL (HANYA YANG DIPENCET) ===== */
+.btn,.tab,.subtab,.st button,.role span{transition:transform .16s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background .2s,color .2s,border-color .2s}
 .btn:hover,.tab:hover,.subtab:hover,.st button:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(79,70,229,.25)}
-.btn:active,.tab:active,.subtab:active,.st button:active,.role span:active{transform:scale(.92);box-shadow:none}
+.btn:active,.tab:active,.subtab:active,.st button:active,.role span:active{transform:scale(.9);box-shadow:none}
 .role span:hover{transform:translateY(-3px);border-color:#a5b4fc}
 .btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
-.st button.on{animation:bounce .35s}
-@keyframes bounce{0%{transform:scale(.7)}60%{transform:scale(1.22)}100%{transform:scale(1)}}
+.st button.pop-click{animation:bounceSingle .32s ease}
+@keyframes bounceSingle{0%{transform:scale(.75)}55%{transform:scale(1.22)}100%{transform:scale(1)}}
 #btnSpin:not(:disabled){animation:glow 1.8s infinite}
 @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(79,70,229,.45)}50%{box-shadow:0 0 0 10px rgba(79,70,229,0)}}
 .tabpane{animation:fade .3s ease}
@@ -216,13 +227,21 @@ details textarea{margin:10px 0}
 .login-err,.form-err{color:var(--alpa);font-size:.85rem;margin:0;min-height:1em}
 .form-ok{color:var(--ok);font-size:.85rem;margin:0}
 
-/* role Mahasiswa: hanya lihat */
+/* role Mahasiswa: hanya lihat, cari/filter tugas, dan centang tugas pribadi */
 body.role-mhs .only-sek,
 body.role-mhs .only-edit,
 body.role-mhs .tab[data-tab=mhs],
 body.role-mhs .tab[data-tab=set]{display:none!important}
+body:not(.role-mhs) .only-mhs{display:none!important}
 body.role-mhs .st button{pointer-events:none}
 body.role-mhs .st button:not(.on){display:none}
+body.role-mhs input:not(.mhs-tugas-chk):not(#tSearch):not(#tHideDone):not(.hist-search):not(#loginName),
+body.role-mhs textarea:not(#rekap),
+body.role-mhs select:not(#filterSetMatkul):not(#tFilter){
+  pointer-events:none;
+  background:#f8fafc;
+  color:#475569;
+}
 
 /* ===== RESPONSIVE MOBILE ===== */
 @media(max-width:600px){
@@ -233,7 +252,6 @@ body.role-mhs .st button:not(.on){display:none}
   .topbar .row{gap:6px}
   .topbar .btn{padding:7px 9px;font-size:.78rem}
 
-  /* Navigasi tetap satu baris dan bisa digeser */
   .tabs{
     padding:0 10px 5px;
     gap:7px;
@@ -250,7 +268,6 @@ body.role-mhs .st button:not(.on){display:none}
   .context .field,.context .grow{width:100%;min-width:0}
   .save-state{margin-left:0}
 
-  /* Setiap mahasiswa tampil konsisten: nama di atas, tombol status di bawah */
   #absenList .item{
     display:flex;
     flex-direction:column;
@@ -264,7 +281,6 @@ body.role-mhs .st button:not(.on){display:none}
   #absenList .st{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;width:100%}
   #absenList .st button{width:100%;height:42px;font-size:.95rem}
 
-  /* Tombol aksi tidak saling berhimpitan */
   .row.between{align-items:flex-start}
   #tab-absen .card > .row.between{flex-direction:column;align-items:stretch}
   #tab-absen .card > .row.between > .row{display:grid;grid-template-columns:1fr 1fr;width:100%}
@@ -274,14 +290,15 @@ body.role-mhs .st button:not(.on){display:none}
   .subtabs{overflow-x:auto}
   .subtab{flex:1 0 auto}
   .groups,.mhs-grp-grid{grid-template-columns:1fr}
-  .sgrp{grid-template-columns:1fr}
+  .sgrp-head{grid-template-columns:1fr}
   .set-mk-bar{align-items:stretch}
   .set-mk-bar input{min-width:0;width:100%}
-  .gcard .addrow{flex-wrap:wrap}
-  .gcard .addrow input{min-width:0;flex:1}
+  .gcard .addrow,.sgrp .addrow{flex-wrap:wrap}
+  .gcard .addrow input,.sgrp .addrow input{min-width:0;flex:1}
   .wheel-wrap{width:min(100%,300px)}
   textarea{max-width:100%}
   input,select,textarea{min-width:0}
+  .mhs-check-wrap{width:100%;justify-content:center}
 }
 
 @media(max-width:380px){
@@ -293,7 +310,7 @@ body.role-mhs .st button:not(.on){display:none}
 }
 
 /* =========================================================
-   CLASSORA ACADEMIC UI
+   STUDY GROUP ACADEMIC UI
    Blue technology theme: navy, electric blue, cyan
    ========================================================= */
 :root{
@@ -538,8 +555,9 @@ input:focus,select:focus,textarea:focus{
   .tab{border-radius:10px}
 }
 
-
-/* ===== CLASSORA BLUE x WARM GOLD EDITION ===== */
+/* =========================================================
+   STUDY GROUP BLUE x WARM GOLD EDITION
+   ========================================================= */
 :root{
   --bg:#f5f7fa;
   --card:#ffffff;
@@ -680,6 +698,208 @@ input:focus,select:focus,textarea:focus{
   .topbar{background:linear-gradient(135deg,#102b46 0%,#1d527f 68%,#9a7541 150%)}
 }
 
+/* =========================================================
+   STUDY GROUP — DARK CINEMATIC / CRIMSON EDITION
+   Visual refresh only. Existing app behavior is preserved.
+   ========================================================= */
+:root{
+  color-scheme:dark;
+  --bg:#09090c;
+  --card:#15151b;
+  --text:#f4f2f2;
+  --muted:#aaa5a8;
+  --line:#383037;
+  --primary:#e50925;
+  --primary-d:#b9061b;
+  --ok:#15966b;
+  --izin:#397fc4;
+  --sakit:#c58a35;
+  --alpa:#e33c50;
+  --navy:#101014;
+  --blue:#34343c;
+  --cyan:#a7a1a4;
+  --gold:#bd8b57;
+  --gold-light:#e8d6c5;
+  --gold-dark:#6f4634;
+}
+html{background:#09090c}
+body{
+  background:
+    radial-gradient(ellipse at 82% 0%,rgba(124,24,35,.19),transparent 34rem),
+    radial-gradient(ellipse at 5% 35%,rgba(105,19,29,.10),transparent 30rem),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 4px),
+    #09090c;
+  color:var(--text);
+}
+body:before{
+  background-image:linear-gradient(rgba(229,9,37,.035) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(229,9,37,.025) 1px,transparent 1px);
+  opacity:.28;
+}
+#app{max-width:1120px;padding-bottom:56px}
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:linear-gradient(110deg,#08080a 0%,#171116 58%,#310d15 130%);
+  border-bottom:1px solid rgba(229,9,37,.38);
+  box-shadow:0 12px 35px rgba(0,0,0,.42);
+  padding:17px clamp(16px,3vw,34px);
+}
+.topbar h2{display:flex;align-items:center;gap:12px}
+.brand-title{font-size:1.18rem;letter-spacing:.11em;font-weight:900}
+.brand-title span:last-child{font-style:italic}
+.brand-title b{color:#f04454}
+.brand-mark,.logo-mark{
+  display:grid;place-items:center;
+  color:#fff;font-weight:1000;font-style:italic;letter-spacing:-.12em;
+  background:linear-gradient(145deg,#fa3449,#a50019);
+  clip-path:polygon(25% 0,100% 0,76% 35%,100% 35%,24% 100%,43% 57%,0 57%);
+  text-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+.brand-mark{width:34px;height:34px;font-size:.72rem;letter-spacing:-.1em;padding-right:5px}
+.topbar small{color:#c7bfc2}
+.topbar .btn.ghost{
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.18);
+  color:#f5eeee;
+}
+.topbar .btn.ghost:hover{background:rgba(229,9,37,.18);border-color:#a62b3b}
+.card{
+  background:linear-gradient(145deg,rgba(25,23,28,.98),rgba(15,15,19,.98));
+  border:1px solid #393039;
+  border-radius:16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.025);
+  color:var(--text);
+}
+.card h3{color:#f4eeee;letter-spacing:.01em}
+.context.card{background:linear-gradient(110deg,#19171c,#121216);border-color:#4a3038}
+.field label{color:#c5b9bd}
+input[type=text],input[type=date],input[type=number],input[type=password],input[type=time],select,textarea{
+  color:#f5f0f1;background:#0d0d11;border:1px solid #484047;
+  border-radius:10px;
+}
+input::placeholder,textarea::placeholder{color:#817980}
+input:focus,select:focus,textarea:focus{
+  border-color:#e02a43;background:#111015;
+  box-shadow:0 0 0 3px rgba(229,9,37,.15);
+}
+details{border-color:#55414a;background:rgba(255,255,255,.018)}
+details summary{color:#f05a6c}
+.btn{
+  background:#201c22;color:#eee7e9;border:1px solid #4b4148;
+  box-shadow:0 3px 9px rgba(0,0,0,.22);
+}
+.btn:hover{background:#30252b}
+.btn.primary{
+  color:#fff;background:linear-gradient(115deg,#a90019,#e50925 65%,#f04454);
+  border-color:#ec263e;box-shadow:0 7px 18px rgba(229,9,37,.22);
+}
+.btn.primary:hover{background:linear-gradient(115deg,#8f0015,#c90822 65%,#df3449)}
+.btn.danger{color:#ff8290;border-color:#71303a;background:#241318}
+.btn.danger:hover{background:#39151e}
+.tabs{
+  background:rgba(15,14,18,.94);border:1px solid #382d34;
+  box-shadow:0 10px 28px rgba(0,0,0,.38);backdrop-filter:blur(16px);
+}
+.tab{background:transparent;color:#b9afb4}
+.tab:hover{background:rgba(229,9,37,.12);color:#fff}
+.tab.active{
+  color:#fff;background:linear-gradient(110deg,#a90019,#e50925);
+  box-shadow:0 5px 16px rgba(229,9,37,.23);
+}
+.subtab{background:#17151a;color:#d3cbd0;border-color:#453941}
+.subtab.active{background:#3a111a;border-color:#d72a41;color:#ff6878}
+.item,.gcard,.mhs-grp-box,.tcard,.hist-card{
+  color:#eee8eb;background:linear-gradient(140deg,#1b191f,#131216);
+  border:1px solid #40353d;border-radius:13px;
+  box-shadow:0 5px 16px rgba(0,0,0,.2);
+}
+.item .nim,.ghead,.muted{color:#aaa1a6}
+.badge,.chip{background:#42151f;color:#ff8794;border:1px solid #6c2634}
+.counter span{background:#211d23;color:#e5dce0;border:1px solid #40363d}
+.st button{background:#17151a;color:#bdb4b9;border-color:#494048}
+.st button.on[data-s=H]{background:#15966b;border-color:#15966b;color:#fff}
+.st button.on[data-s=I]{background:#397fc4;border-color:#397fc4;color:#fff}
+.st button.on[data-s=S]{background:#c58a35;border-color:#c58a35;color:#fff}
+.st button.on[data-s=A]{background:#d83b50;border-color:#d83b50;color:#fff}
+.spin-box{
+  color:#fff;background:linear-gradient(130deg,#25151b,#17151b);
+  border:1.5px dashed #a52a3c;
+}
+.spin-box.spinning{color:#ff6477}
+.setbox,.source-box{background:linear-gradient(140deg,#1d191f,#151318);border-color:#55404a}
+.set-mk-bar{background:#29171d;border-color:#63303b}
+.set-mk-bar label,.pool-info{color:#ff8492}
+.mhs-grp-box h5,.day-h{color:#ff687b}
+.day-h.today{color:#fff;background:linear-gradient(90deg,#48131e,#25151b)}
+.hist-stat{background:#19171c;border-color:#40373e;color:#e9e2e5}
+.hist-names{color:#e7dfe3}
+.hist-edit-panel{background:#21171c;border-color:#a75a68}
+.hist-edit-row{background:#17151a;border-color:#463a41}
+.tcard.done{background:#15171a}
+.tcard.mhs-checked{background:#13211d;border-color:#277c5e}
+.mhs-check-wrap{background:#191b20;color:#e6e1e4;border-color:#45414a}
+.mhs-check-wrap:hover{background:#24232a;border-color:#a93a4b}
+.mhs-check-wrap.checked{background:#143126;border-color:#277c5e;color:#a8f0cf}
+.chip.warn{background:#382918;color:#f5c77f}
+.chip.late{background:#42151f;color:#ff8794}
+.chip.ok{background:#143126;color:#9ee7c6}
+.xbtn{background:#5b1824;color:#ffdce1}
+.login-wrap{
+  min-height:100vh;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 14% 18%,rgba(229,9,37,.25),transparent 28%),
+    radial-gradient(circle at 88% 84%,rgba(126,31,48,.20),transparent 30%),
+    linear-gradient(135deg,#08080a 0%,#171116 58%,#300d16 130%);
+}
+.login-wrap:before,.login-wrap:after{
+  border-color:rgba(229,9,37,.19);
+  box-shadow:0 0 0 32px rgba(229,9,37,.025),0 0 0 76px rgba(255,255,255,.012);
+}
+.login-card{
+  background:linear-gradient(145deg,rgba(29,25,31,.98),rgba(15,14,18,.98));
+  color:#f4eef0;border:1px solid #62303b;border-radius:22px;
+  box-shadow:0 28px 80px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.04);
+}
+.login-card h1{
+  color:#fff;font-weight:1000;font-style:italic;letter-spacing:.08em;
+  text-transform:uppercase;text-shadow:0 4px 22px rgba(229,9,37,.22);
+}
+.logo{display:flex;justify-content:center;filter:drop-shadow(0 8px 18px rgba(229,9,37,.24))}
+.logo-mark{width:72px;height:72px;font-size:1.35rem;padding-right:10px}
+.role span{background:#17151a;border-color:#484047;color:#f3edef}
+.role small{color:#aaa1a6}
+.role input:checked + span{
+  border-color:#e52a43;background:linear-gradient(140deg,#35131c,#21171d);
+  box-shadow:0 0 0 3px rgba(229,9,37,.12);
+}
+.login-card .muted{color:#b4aab0}
+#btnLogin{font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+.login-err,.form-err{color:#ff8794}
+.form-ok{color:#91e0bd}
+.toast{background:#2b1118;color:#fff;border:1px solid #78303d;box-shadow:0 10px 28px rgba(0,0,0,.42)}
+.empty{color:#aaa1a6}
+#lightbox{background:rgba(0,0,0,.94)}
+.btn:hover,.tab:hover,.subtab:hover,.st button:hover{box-shadow:0 7px 18px rgba(229,9,37,.13)}
+#btnSpin:not(:disabled){animation:glowCrimson 1.8s infinite}
+@keyframes glowCrimson{
+  0%,100%{box-shadow:0 0 0 0 rgba(229,9,37,.28)}
+  50%{box-shadow:0 0 0 10px rgba(229,9,37,0)}
+}
+@media(min-width:900px){
+  .topbar{border-radius:0 0 18px 18px}
+  .tabs{margin-top:12px;border-radius:15px}
+}
+@media(max-width:600px){
+  #app{padding-bottom:30px}
+  .topbar{border-radius:0 0 14px 14px;padding:13px 14px}
+  .brand-title{font-size:.98rem;letter-spacing:.08em}
+  .brand-mark{width:29px;height:29px}
+  .tabs{margin:0 9px;padding:7px;border-radius:0 0 13px 13px}
+  .card{margin:10px;border-radius:14px;padding:14px}
+  .context.card{gap:9px}
+  .login-card{padding:24px 19px}
+}
+
 </style>
 </head>
 <body>
@@ -687,8 +907,8 @@ input:focus,select:focus,textarea:focus{
 <!-- ========== LOGIN ========== -->
 <section id="login" class="login-wrap">
   <div class="login-card">
-    <div class="logo">🏛️</div>
-    <h1>CLASSORA</h1>
+    <div class="logo"><span class="logo-mark">SG</span></div>
+    <h1>Study Group</h1>
     <p class="muted">Masuk sebagai siapa?</p>
 
     <div class="role-pick">
@@ -698,7 +918,7 @@ input:focus,select:focus,textarea:focus{
       </label>
       <label class="role">
         <input type="radio" name="role" value="Mahasiswa">
-        <span><b>Mahasiswa</b><small>Hanya lihat</small></span>
+        <span><b>Mahasiswa</b><small>Lihat riwayat &amp; tandai tugas selesai</small></span>
       </label>
     </div>
 
@@ -716,7 +936,7 @@ input:focus,select:focus,textarea:focus{
 <div id="app" class="hidden">
   <header class="topbar">
     <div>
-      <h2>🏛️ CLASSORA</h2>
+      <h2 class="brand-title"><span class="brand-mark">SG</span><span>STUDY <b>GROUP</b></span></h2>
       <small id="whoami"></small>
     </div>
     <div class="row gap">
@@ -779,7 +999,7 @@ input:focus,select:focus,textarea:focus{
 
   <!-- ===== TAB MAHASISWA ===== -->
   <main id="tab-mhs" class="tabpane hidden">
-    <div class="card">
+    <div class="card only-edit">
       <h3>Tambah Mahasiswa</h3>
       <div class="row gap wrap">
         <input id="mName" class="grow" type="text" placeholder="Nama">
@@ -980,6 +1200,7 @@ input:focus,select:focus,textarea:focus{
       <div class="row between wrap">
         <h3>📝 Daftar Tugas <span id="tCount" class="badge">0</span></h3>
         <div class="row gap wrap">
+          <input id="tSearch" type="text" placeholder="Cari tugas / matkul..." style="width:auto;min-width:170px">
           <select id="tFilter" style="width:auto"></select>
           <label class="check" style="padding-bottom:0"><input id="tHideDone" type="checkbox"> Sembunyikan yang selesai</label>
         </div>
@@ -995,14 +1216,20 @@ input:focus,select:focus,textarea:focus{
         <button class="subtab active" data-h="absen">✅ Riwayat Absen</button>
         <button class="subtab" data-h="kel">🎡 Riwayat Kelompok</button>
       </div>
-      <div id="histAbsen" class="list"></div>
-      <div id="histKel" class="list hidden"></div>
+      <div id="histAbsenPane" class="list">
+        <input id="histSearchAbsen" class="hist-search" type="text" placeholder="🔍 Cari berdasarkan nama mata kuliah..." autocomplete="off">
+        <div id="histAbsen" class="list"></div>
+      </div>
+      <div id="histKelPane" class="list hidden">
+        <input id="histSearchKel" class="hist-search" type="text" placeholder="🔍 Cari berdasarkan nama mata kuliah..." autocomplete="off">
+        <div id="histKel" class="list"></div>
+      </div>
     </div>
   </main>
 
   <!-- ===== TAB PENGATURAN ===== -->
   <main id="tab-set" class="tabpane hidden">
-    <div class="card">
+    <div class="card only-edit">
       <h3>🔑 Ganti Sandi Sekretaris</h3>
       <div class="field">
         <label for="codeOld">Sandi lama</label>
@@ -1035,6 +1262,7 @@ const DB_NODE = "classora_pti_data";
 const isConfigured = () => Boolean(FIREBASE_DB_URL);
 
 const KEY_SES = 'classora_session_v2';
+const KEY_MHS_TUGAS = 'classora_mhs_tugas_done_v1';
 const DEFAULT_CODE = '11223344';
 
 /* ================= STATE UTAMA (TERPUSAT DI CLOUD) ================= */
@@ -1049,14 +1277,41 @@ let cloudState = {
 };
 
 let session = (() => {
-  try { return JSON.parse(sessionStorage.getItem(KEY_SES) || localStorage.getItem(KEY_SES)); }
-  catch { return null; }
+  try {
+    const raw = sessionStorage.getItem(KEY_SES) || localStorage.getItem(KEY_SES);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed && (parsed.role === 'Sekretaris' || parsed.role === 'Mahasiswa')) return parsed;
+    return null;
+  } catch { return null; }
 })();
 
+// Penyimpanan centang tugas pribadi per mahasiswa
+function getMhsDoneMap() {
+  try {
+    const all = JSON.parse(localStorage.getItem(KEY_MHS_TUGAS) || '{}');
+    const userKey = (session && session.name ? session.name.trim().toLowerCase() : 'default');
+    return all[userKey] || {};
+  } catch { return {}; }
+}
+function toggleMhsTugasDone(tugasId) {
+  if (!isMhs()) return false;
+  try {
+    const all = JSON.parse(localStorage.getItem(KEY_MHS_TUGAS) || '{}');
+    const userKey = (session && session.name ? session.name.trim().toLowerCase() : 'default');
+    if (!all[userKey]) all[userKey] = {};
+    all[userKey][tugasId] = !all[userKey][tugasId];
+    localStorage.setItem(KEY_MHS_TUGAS, JSON.stringify(all));
+    return all[userKey][tugasId];
+  } catch { return false; }
+}
+
 let status = {};
-// Menandai konteks absensi yang baru saja disimpan agar sinkronisasi cloud
-// tidak mengisi ulang formulir yang sudah dikosongkan.
-let clearedAttendanceKey = null;
+let isAbsenDirty = false;
+let clearedAbsenKey = null;
+let editingAbsenKey = null;
+let editingAbsenDraft = null;
+let editingKelId = null;
+let editingKelDraft = null;
 let curGroups = [];
 let spinResults = [];
 let wheelAngle = 0, wheelBusy = false;
@@ -1072,7 +1327,8 @@ const mod = (a, m) => ((a % m) + m) % m;
 
 const STATUS = { H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' };
 const HARI = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-const isMhs = () => session && session.role === 'Mahasiswa';
+const isMhs = () => Boolean(session && session.role === 'Mahasiswa');
+const canEdit = () => Boolean(session && session.role === 'Sekretaris');
 const getCode = () => cloudState.secretCode || DEFAULT_CODE;
 
 function todayStr() {
@@ -1091,7 +1347,10 @@ function fmtShort(s) {
 }
 const ctxKey = (date = $('#date').value, matkul = $('#matkul').value) =>
   matkul.trim() ? `${date}|${matkul.trim().toLowerCase()}` : null;
-const goTab = name => document.querySelector(`.tab[data-tab=${name}]`).click();
+const goTab = name => {
+  const btn = document.querySelector(`.tab[data-tab=${name}]`);
+  if (btn) btn.click();
+};
 
 function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
@@ -1133,7 +1392,7 @@ async function pullFromCloud(silent = false) {
           updatedAt: serverTs
         };
         lastServerTimestamp = serverTs;
-        refreshAllViews();
+        refreshAllViews(!silent);
       }
     }
     setSaveState('Cloud Tersinkron ✓', 'ok');
@@ -1147,6 +1406,7 @@ async function pullFromCloud(silent = false) {
 
 let pushTimer = null;
 function pushToCloud(immediate = false) {
+  if (!canEdit()) return;
   if (!isConfigured()) return;
   cloudState.updatedAt = Date.now();
   lastServerTimestamp = cloudState.updatedAt;
@@ -1160,6 +1420,7 @@ function pushToCloud(immediate = false) {
         body: JSON.stringify(cloudState)
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
+      isAbsenDirty = false;
       setSaveState('Tersimpan di Cloud ✓', 'ok');
     } catch (err) {
       console.error('Cloud Push Error:', err);
@@ -1170,27 +1431,49 @@ function pushToCloud(immediate = false) {
 
   clearTimeout(pushTimer);
   if (immediate) execPush();
-  else pushTimer = setTimeout(execPush, 500);
+  else pushTimer = setTimeout(execPush, 700);
 }
 
 setInterval(() => {
-  if (session && !wheelBusy) pullFromCloud(true);
-}, 6000);
+  if (session && !wheelBusy && !isAbsenDirty && !editingAbsenKey && !editingKelId) {
+    const activeEl = document.activeElement;
+    if (activeEl && $('#setsList') && $('#setsList').contains(activeEl)) return;
+    pullFromCloud(true);
+  }
+}, 7000);
 
-$('#btnRefreshCloud').onclick = () => { pullFromCloud(false); toast('Memperbarui data dari cloud...'); };
+$('#btnRefreshCloud').onclick = () => {
+  isAbsenDirty = false;
+  pullFromCloud(false);
+  toast('Memperbarui data dari cloud...');
+};
 
 /* ================= LOGIN & VALIDASI ================= */
+function enforceRoleLock() {
+  const mhs = isMhs();
+  document.body.classList.toggle('role-mhs', mhs);
+  $('#note').readOnly = mhs;
+  $('#rekap').readOnly = true;
+  $('#date').readOnly = mhs;
+  $('#matkul').readOnly = mhs;
+}
+
 function applySession() {
   if (!session) {
+    document.body.classList.remove('role-mhs');
     $('#login').classList.remove('hidden');
     $('#app').classList.add('hidden');
     return;
   }
   $('#login').classList.add('hidden');
   $('#app').classList.remove('hidden');
-  document.body.classList.toggle('role-mhs', isMhs());
-  $('#note').readOnly = isMhs();
-  if (isMhs()) goTab('absen');
+  enforceRoleLock();
+  if (isMhs()) {
+    currentActiveTab = 'absen';
+    $$('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === 'absen'));
+    $$('.tabpane').forEach(p => p.classList.toggle('hidden', p.id !== 'tab-absen'));
+    updateContextVisibility('absen');
+  }
   $('#whoami').textContent = `${session.role} • ${session.name}`;
   initApp();
 }
@@ -1233,7 +1516,10 @@ async function doLogin() {
   }
 
   $('#loginCode').value = '';
-  try { localStorage.setItem(KEY_SES, JSON.stringify(session)); } catch {}
+  try {
+    sessionStorage.setItem(KEY_SES, JSON.stringify(session));
+    localStorage.setItem(KEY_SES, JSON.stringify(session));
+  } catch {}
   applySession();
 }
 
@@ -1241,7 +1527,10 @@ $('#btnLogin').onclick = doLogin;
 $('#loginName').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
 $('#loginCode').onkeydown = e => { if (e.key === 'Enter') doLogin(); };
 $('#btnLogout').onclick = () => {
-  try { localStorage.removeItem(KEY_SES); } catch {}
+  try {
+    sessionStorage.removeItem(KEY_SES);
+    localStorage.removeItem(KEY_SES);
+  } catch {}
   session = null;
   applySession();
 };
@@ -1252,7 +1541,7 @@ function updateContextVisibility(activeTab = currentActiveTab) {
   const dateField = $('#date').closest('.field');
   const matkulField = $('#matkul').closest('.field');
 
-  const showInputs = (activeTab === 'absen') || (activeTab === 'kelompok' && !isMhs());
+  const showInputs = (activeTab === 'absen') || (activeTab === 'kelompok' && canEdit());
 
   dateField.classList.toggle('hidden', !showInputs);
   matkulField.classList.toggle('hidden', !showInputs);
@@ -1262,9 +1551,13 @@ function updateContextVisibility(activeTab = currentActiveTab) {
 }
 
 $$('.tab').forEach(b => b.onclick = () => {
+  const t = b.dataset.tab;
+  if (isMhs() && (t === 'mhs' || t === 'set')) {
+    toast('Akses khusus Sekretaris');
+    return;
+  }
   $$('.tab').forEach(x => x.classList.toggle('active', x === b));
   $$('.tabpane').forEach(p => p.classList.add('hidden'));
-  const t = b.dataset.tab;
   currentActiveTab = t;
   $('#tab-' + t).classList.remove('hidden');
 
@@ -1288,66 +1581,94 @@ function refreshMatkulList() {
 
 function loadContext() {
   const key = ctxKey();
+  const rec = key && cloudState.records[key];
 
-  // Jika konteks ini baru saja disimpan, biarkan formulir tetap kosong.
-  // Saat pengguna berpindah ke konteks lain, riwayat konteks tersebut
-  // tetap bisa dimuat seperti biasa.
-  if (key && key === clearedAttendanceKey) {
+  // Setelah absensi disimpan, form untuk konteks yang sama tetap kosong.
+  // Data aslinya tetap tersimpan dan bisa dilihat atau diedit dari Riwayat.
+  if (key && key === clearedAbsenKey) {
     status = {};
     $('#note').value = '';
-    renderAbsen();
-    return;
+  } else if (rec) {
+    status = rec.status ? { ...rec.status } : {};
+    $('#note').value = rec.note || '';
+  } else if (!isAbsenDirty) {
+    status = {};
+    $('#note').value = '';
   }
-
-  if (key !== clearedAttendanceKey) clearedAttendanceKey = null;
-
-  const rec = key && cloudState.records[key];
-  status = rec && rec.status ? { ...rec.status } : {};
-  $('#note').value = rec ? (rec.note || '') : '';
   renderAbsen();
 }
 
 function openContext(date, matkul) {
+  isAbsenDirty = false;
   $('#date').value = date;
   $('#matkul').value = matkul;
   loadContext();
 }
-$('#date').onchange = loadContext;
-$('#matkul').oninput = loadContext;
+$('#date').onchange = () => {
+  if (isMhs()) return;
+  isAbsenDirty = false;
+  clearedAbsenKey = null;
+  loadContext();
+};
+$('#matkul').onchange = () => {
+  if (isMhs()) return;
+  clearedAbsenKey = null;
+  const key = ctxKey();
+  if (key && cloudState.records[key]) {
+    isAbsenDirty = false;
+    loadContext();
+  } else {
+    updateRekap();
+  }
+};
+$('#matkul').oninput = () => {
+  if (isMhs()) return;
+  updateRekap();
+};
 
-function refreshAllViews() {
+function refreshAllViews(forceLoadCtx = false) {
+  enforceRoleLock();
   renderStudents();
   refreshMatkulList();
-  loadContext();
+  if (forceLoadCtx || !isAbsenDirty) {
+    loadContext();
+  } else {
+    updateCounter();
+    updateRekap();
+  }
   renderGroups();
   renderSavedGroups();
   renderJadwal();
   renderTugas();
-  renderHistory();
+  if (!editingAbsenKey && !editingKelId) renderHistory();
   updateContextVisibility(currentActiveTab);
 }
 
 /* ================= MAHASISWA ================= */
 function addStudent(name, nim) {
+  if (!canEdit()) return false;
   name = name.trim(); if (!name) return false;
   cloudState.students.push({ id: uid(), name, nim: (nim || '').trim() });
   return true;
 }
 function saveStudents() {
+  if (!canEdit()) return;
   pushToCloud(true);
   renderStudents();
   renderAbsen();
 }
 
 $('#btnAddMhs').onclick = () => {
+  if (!canEdit()) return;
   if (addStudent($('#mName').value, $('#mNim').value)) {
     $('#mName').value = ''; $('#mNim').value = ''; $('#mName').focus(); saveStudents();
   }
 };
-$('#mName').onkeydown = e => { if (e.key === 'Enter') $('#btnAddMhs').click(); };
-$('#mNim').onkeydown  = e => { if (e.key === 'Enter') $('#btnAddMhs').click(); };
+$('#mName').onkeydown = e => { if (e.key === 'Enter' && canEdit()) $('#btnAddMhs').click(); };
+$('#mNim').onkeydown  = e => { if (e.key === 'Enter' && canEdit()) $('#btnAddMhs').click(); };
 
 $('#btnBulk').onclick = () => {
+  if (!canEdit()) return;
   let n = 0;
   $('#bulk').value.split('\n').forEach(line => {
     const parts = line.split(/\s[-–,]\s|\t/);
@@ -1356,6 +1677,7 @@ $('#btnBulk').onclick = () => {
   $('#bulk').value = ''; saveStudents(); toast(`${n} mahasiswa ditambahkan`);
 };
 $('#btnClearMhs').onclick = () => {
+  if (!canEdit()) return;
   if (confirm('Hapus SEMUA daftar mahasiswa? (riwayat absen tetap ada)')) {
     cloudState.students = []; saveStudents();
   }
@@ -1366,17 +1688,19 @@ function renderStudents() {
   $('#mhsList').innerHTML = list.length ? list.map((s, i) => `
     <div class="item">
       <div><span class="nm">${i + 1}. ${esc(s.name)}</span>${s.nim ? `<div class="nim">${esc(s.nim)}</div>` : ''}</div>
-      <div class="row gap">
+      <div class="row gap only-edit">
         <button class="btn small" data-edit="${s.id}">Edit</button>
         <button class="btn small danger only-sek" data-del="${s.id}">Hapus</button>
       </div>
     </div>`).join('') : '<div class="empty">Belum ada mahasiswa. Tambahkan di atas.</div>';
 }
 $('#mhsList').onclick = e => {
+  if (!canEdit()) return;
   const del = e.target.dataset.del, ed = e.target.dataset.edit;
   if (del) { cloudState.students = cloudState.students.filter(s => s.id !== del); saveStudents(); }
   if (ed) {
     const s = cloudState.students.find(x => x.id === ed);
+    if (!s) return;
     const nm = prompt('Nama:', s.name); if (nm === null) return;
     const nim = prompt('NIM (boleh kosong):', s.nim || ''); if (nim === null) return;
     s.name = nm.trim() || s.name; s.nim = nim.trim(); saveStudents();
@@ -1390,21 +1714,59 @@ function renderAbsen() {
     <div class="item">
       <div><span class="nm">${i + 1}. ${esc(s.name)}</span>${s.nim ? `<div class="nim">${esc(s.nim)}</div>` : ''}</div>
       <div class="st" data-id="${s.id}">
-        ${Object.keys(STATUS).map(k => `<button data-s="${k}" title="${STATUS[k]}" class="${status[s.id] === k ? 'on' : ''}">${k}</button>`).join('')}
+        ${Object.keys(STATUS).map(k => `<button type="button" data-s="${k}" title="${STATUS[k]}" class="${status[s.id] === k ? 'on' : ''}">${k}</button>`).join('')}
       </div>
     </div>`).join('') : '<div class="empty">Belum ada daftar mahasiswa.</div>';
   updateCounter(); updateRekap(); updatePoolInfo();
 }
+
 $('#absenList').onclick = e => {
-  if (isMhs()) return;
-  const btn = e.target.closest('button[data-s]'); if (!btn) return;
-  const id = btn.parentElement.dataset.id, s = btn.dataset.s;
-  if (status[id] === s) delete status[id]; else status[id] = s;
-  renderAbsen(); autosaveAbsen();
+  if (!canEdit()) return;
+  const btn = e.target.closest('button[data-s]');
+  if (!btn) return;
+  const stGroup = btn.parentElement;
+  const id = stGroup.dataset.id;
+  const s = btn.dataset.s;
+
+  status[id] = s;
+  isAbsenDirty = true;
+
+  stGroup.querySelectorAll('button[data-s]').forEach(b => {
+    b.classList.toggle('on', b === btn);
+    b.classList.remove('pop-click');
+  });
+
+  void btn.offsetWidth;
+  btn.classList.add('pop-click');
+
+  updateCounter();
+  updateRekap();
+  updatePoolInfo();
+  autosaveAbsen();
 };
-$('#btnAllHadir').onclick = () => { cloudState.students.forEach(s => status[s.id] = 'H'); renderAbsen(); autosaveAbsen(); };
-$('#btnResetAbsen').onclick = () => { if (confirm('Kosongkan semua status absen?')) { status = {}; renderAbsen(); autosaveAbsen(); } };
-$('#note').oninput = () => { updateRekap(); autosaveAbsen(); };
+
+$('#btnAllHadir').onclick = () => {
+  if (!canEdit()) return;
+  cloudState.students.forEach(s => status[s.id] = 'H');
+  isAbsenDirty = true;
+  renderAbsen();
+  autosaveAbsen();
+};
+$('#btnResetAbsen').onclick = () => {
+  if (!canEdit()) return;
+  if (confirm('Kosongkan semua status absen?')) {
+    status = {};
+    isAbsenDirty = true;
+    renderAbsen();
+    autosaveAbsen();
+  }
+};
+$('#note').oninput = () => {
+  if (!canEdit()) return;
+  isAbsenDirty = true;
+  updateRekap();
+  autosaveAbsen();
+};
 
 function updateCounter() {
   const c = { H: 0, I: 0, S: 0, A: 0 };
@@ -1437,21 +1799,27 @@ function updateRekap() {
 }
 $('#btnCopyRekap').onclick = () => copyText($('#rekap').value);
 
-function saveAbsenToCloud(immediate = false) {
-  if (isMhs()) return false;
+function saveAbsenToCloud(immediate = false, silentWarn = false) {
+  if (!canEdit()) return false;
 
   const date = $('#date').value;
   const matkul = $('#matkul').value.trim();
 
   if (!date) {
-    setSaveState('Pilih tanggal terlebih dahulu', 'warn');
-    toast('Tanggal absen belum dipilih');
+    if (!silentWarn) {
+      setSaveState('Pilih tanggal terlebih dahulu', 'warn');
+      toast('Tanggal absen belum dipilih');
+    }
     return false;
   }
   if (!matkul) {
-    setSaveState('Isi mata kuliah agar absen tersimpan', 'warn');
-    toast('Isi nama mata kuliah sebelum menyimpan absen');
-    $('#matkul').focus();
+    if (!silentWarn) {
+      setSaveState('Isi mata kuliah agar absen tersimpan', 'warn');
+      toast('Isi nama mata kuliah sebelum menyimpan absen');
+      $('#matkul').focus();
+    } else {
+      setSaveState('Belum disimpan (isi Mata Kuliah)', 'warn');
+    }
     return false;
   }
 
@@ -1469,20 +1837,21 @@ function saveAbsenToCloud(immediate = false) {
 }
 
 function autosaveAbsen() {
-  saveAbsenToCloud(false);
+  saveAbsenToCloud(false, true);
 }
 
 $('#btnSaveAbsen').onclick = () => {
-  if (saveAbsenToCloud(true)) {
-    // Simpan data terlebih dahulu, lalu kosongkan formulir tanpa menghapus
-    // catatan yang sudah masuk ke cloud/riwayat.
-    clearedAttendanceKey = ctxKey();
+  if (!canEdit()) return;
+  if (saveAbsenToCloud(true, false)) {
+    // Simpan dulu data lengkap ke Riwayat/Cloud, baru kosongkan form input.
+    clearedAbsenKey = ctxKey();
     status = {};
     $('#note').value = '';
+    isAbsenDirty = false;
+    $('#btnSaveAbsen').textContent = '💾 Simpan Absen';
     renderAbsen();
-    updateRekap();
     renderHistory();
-    toast('Absensi tersimpan. Formulir dikosongkan ✓');
+    toast('Absensi tersimpan. Form absen sudah dikosongkan ✓');
   }
 };
 
@@ -1565,7 +1934,7 @@ function drawWheel(items, ang) {
 }
 
 function refreshWheel() {
-  if (wheelBusy || isMhs()) return;
+  if (wheelBusy || !canEdit()) return;
   const items = wheelCandidates();
   $('#wheelInfo').textContent = `Isi roda: ${items.length} item`;
   drawWheel(items, wheelAngle);
@@ -1610,10 +1979,10 @@ function updatePoolInfo() {
 }
 
 ['#extraNames', '#usePTI', '#onlyPresent', '#wheelList', '#wNoRepeat', '#wAssign'].forEach(s => {
-  $(s).addEventListener('input', () => { syncSpinUI(); updatePoolInfo(); });
-  $(s).addEventListener('change', () => { syncSpinUI(); updatePoolInfo(); });
+  $(s).addEventListener('input', () => { if (!canEdit()) return; syncSpinUI(); updatePoolInfo(); });
+  $(s).addEventListener('change', () => { if (!canEdit()) return; syncSpinUI(); updatePoolInfo(); });
 });
-$$('input[name=spinMode], input[name=wSrc]').forEach(r => r.addEventListener('change', () => { syncSpinUI(); updatePoolInfo(); }));
+$$('input[name=spinMode], input[name=wSrc]').forEach(r => r.addEventListener('change', () => { if (!canEdit()) return; syncSpinUI(); updatePoolInfo(); }));
 
 function renderSpinLog() {
   $('#spinLog').innerHTML = spinResults.length
@@ -1625,6 +1994,7 @@ $('#btnCopyLog').onclick = () => {
   copyText('HASIL SPIN\n' + spinResults.map((r, i) => `${i + 1}. ${r}`).join('\n'));
 };
 $('#btnResetWheel').onclick = () => {
+  if (!canEdit()) return;
   if (spinResults.length && !confirm('Reset roda dan hapus daftar hasil spin?')) return;
   spinResults = []; renderSpinLog(); $('#spinBox').textContent = 'Tekan SPIN!'; updatePoolInfo();
 };
@@ -1640,6 +2010,7 @@ function ensureGroups() {
 }
 
 async function spinAuto() {
+  if (!canEdit()) return;
   const items = wheelCandidates();
   if (items.length < 2) { alert('Peserta kurang dari 2. Aktifkan daftar kelas atau tambah nama lain.'); return; }
   if (curGroups.some(g => g.members.length) &&
@@ -1663,6 +2034,7 @@ async function spinAuto() {
 }
 
 async function spinIndiv() {
+  if (!canEdit()) return;
   const items = wheelCandidates();
   if (!items.length) { toast('Roda kosong. Tambahkan item atau reset roda.'); return; }
   if (assignOn() && !ensureGroups()) return;
@@ -1682,9 +2054,9 @@ async function spinIndiv() {
   }
   updatePoolInfo();
 }
-$('#btnSpin').onclick = () => (getMode() === 'indiv' ? spinIndiv() : spinAuto());
+$('#btnSpin').onclick = () => { if (canEdit()) (getMode() === 'indiv' ? spinIndiv() : spinAuto()); };
 
-/* ================= KELOMPOK: DRAF & AUTO-RESET ================= */
+/* ================= KELOMPOK: DRAF & KELOMPOK TERSIMPAN ================= */
 function allNames() {
   const seen = new Set(), out = [];
   [...cloudState.students, ...parseExtra()].forEach(s => {
@@ -1698,8 +2070,19 @@ function unassigned() {
   return allNames().filter(s => !used.has(labelOf(s).toLowerCase()));
 }
 
+function resolveMemberLabel(text) {
+  text = (text || '').trim();
+  if (!text) return null;
+  const lower = text.toLowerCase(), pool = allNames();
+  const hit = pool.find(x => labelOf(x).toLowerCase() === lower) || pool.find(x => x.name.toLowerCase() === lower);
+  if (hit) return labelOf(hit);
+  const p = text.split(/\s[-–,]\s|\t/), nm = (p[0] || '').trim();
+  if (!nm) return null;
+  return nm + (p[1] && p[1].trim() ? ` (${p[1].trim()})` : '');
+}
+
 function renderGroups() {
-  if (isMhs()) return;
+  if (!canEdit()) return;
   $('#availList').innerHTML = unassigned().map(s => `<option value="${esc(labelOf(s))}">`).join('');
   $('#groupsWrap').innerHTML = curGroups.length ? curGroups.map((g, i) => `
     <div class="gcard" style="animation-delay:${i * 60}ms">
@@ -1717,6 +2100,7 @@ function renderGroups() {
 }
 
 $('#groupsWrap').oninput = e => {
+  if (!canEdit()) return;
   const i = e.target.dataset.i; if (i === undefined) return;
   if (e.target.classList.contains('gname')) curGroups[i].name = e.target.value;
   else if (e.target.classList.contains('materi')) curGroups[i].materi = e.target.value;
@@ -1726,38 +2110,33 @@ function afterGroupEdit(focusI) {
   renderGroups(); updatePoolInfo();
   if (focusI !== undefined) { const el = document.querySelector(`.addm[data-i="${focusI}"]`); if (el) el.focus(); }
 }
-function nextGroupName() {
-  const used = new Set(curGroups.map(g => g.name.trim().toLowerCase()));
-  let n = curGroups.length + 1;
+function nextGroupName(list = curGroups) {
+  const used = new Set(list.map(g => g.name.trim().toLowerCase()));
+  let n = list.length + 1;
   while (used.has(`kelompok ${n}`)) n++;
   return `Kelompok ${n}`;
 }
-function addMember(gi, text) {
-  text = (text || '').trim(); if (!text) return false;
-  const lower = text.toLowerCase(), pool = allNames();
-  const hit = pool.find(x => labelOf(x).toLowerCase() === lower) || pool.find(x => x.name.toLowerCase() === lower);
-  let label;
-  if (hit) label = labelOf(hit);
-  else {
-    const p = text.split(/\s[-–,]\s|\t/), nm = (p[0] || '').trim();
-    if (!nm) return false;
-    label = nm + (p[1] && p[1].trim() ? ` (${p[1].trim()})` : '');
-  }
-  const holder = curGroups.findIndex(g => g.members.some(m => m.toLowerCase() === label.toLowerCase()));
-  if (holder > -1) { toast(`${label} sudah ada di ${curGroups[holder].name}`); return false; }
-  curGroups[gi].members.push(label); return true;
+function addMemberToList(groupList, gi, text) {
+  const label = resolveMemberLabel(text);
+  if (!label) return false;
+  const holder = groupList.findIndex(g => g.members.some(m => m.toLowerCase() === label.toLowerCase()));
+  if (holder > -1) { toast(`${label} sudah ada di ${groupList[holder].name}`); return false; }
+  groupList[gi].members.push(label);
+  return true;
 }
 
 $('#btnAddGroup').onclick = () => {
-  curGroups.push({ name: nextGroupName(), materi: '', members: [] });
+  if (!canEdit()) return;
+  curGroups.push({ name: nextGroupName(curGroups), materi: '', members: [] });
   renderGroups();
   const last = $('#groupsWrap').lastElementChild, inp = last && last.querySelector('.gname');
   if (inp) { inp.focus(); inp.select(); }
 };
 $('#groupsWrap').onclick = e => {
+  if (!canEdit()) return;
   const b = e.target.closest('[data-gact]'); if (!b) return;
   const i = +b.dataset.i, act = b.dataset.gact;
-  if (act === 'add') { const inp = b.parentElement.querySelector('.addm'); if (addMember(i, inp.value)) afterGroupEdit(i); }
+  if (act === 'add') { const inp = b.parentElement.querySelector('.addm'); if (addMemberToList(curGroups, i, inp.value)) afterGroupEdit(i); }
   if (act === 'rm') { curGroups[i].members.splice(+b.dataset.m, 1); afterGroupEdit(); }
   if (act === 'delg') {
     const g = curGroups[i];
@@ -1766,13 +2145,13 @@ $('#groupsWrap').onclick = e => {
   }
 };
 $('#groupsWrap').onkeydown = e => {
-  if (e.key !== 'Enter' || !e.target.classList.contains('addm')) return;
+  if (!canEdit() || e.key !== 'Enter' || !e.target.classList.contains('addm')) return;
   e.preventDefault();
   const i = +e.target.dataset.i;
-  if (addMember(i, e.target.value)) afterGroupEdit(i);
+  if (addMemberToList(curGroups, i, e.target.value)) afterGroupEdit(i);
 };
 $('#groupsWrap').onchange = e => {
-  if (!e.target.classList.contains('mv') || e.target.value === '') return;
+  if (!canEdit() || !e.target.classList.contains('mv') || e.target.value === '') return;
   const i = +e.target.dataset.i, m = +e.target.dataset.m, to = +e.target.value;
   const [who] = curGroups[i].members.splice(m, 1);
   curGroups[to].members.push(who); afterGroupEdit();
@@ -1793,6 +2172,7 @@ function resetGroupCreationForm() {
 }
 
 $('#btnClearGroups').onclick = () => {
+  if (!canEdit()) return;
   if (!curGroups.length && !$('#matkul').value.trim()) return toast('Form sudah kosong');
   if (!confirm('Kosongkan seluruh form pembuatan kelompok ini?')) return;
   resetGroupCreationForm();
@@ -1816,6 +2196,7 @@ $('#btnCopyGroups').onclick = () => {
 };
 
 $('#btnSaveSet').onclick = () => {
+  if (!canEdit()) return;
   if (!curGroups.length) return toast('Belum ada kelompok untuk disimpan. Silakan SPIN atau Tambah Kelompok dulu.');
   const rawMatkul = $('#matkul').value.trim();
   const matkulLabel = rawMatkul || 'Belum Ada Mata Kuliah';
@@ -1880,33 +2261,57 @@ function renderSavedGroups() {
       </div>
     `).join('');
   } else {
-    box.innerHTML = filtered.map(s => `
+    box.innerHTML = filtered.map(s => {
+      const usedSet = new Set(s.groups.flatMap(g => g.members.map(m => m.toLowerCase())));
+      const availForSet = allNames().filter(st => !usedSet.has(labelOf(st).toLowerCase()));
+      const dlId = `dl-set-${s.id}`;
+      return `
       <div class="setbox" data-sid="${s.id}">
         <div class="set-mk-bar">
           <label>📘 Mata Kuliah:</label>
           <input class="edit-set-matkul" type="text" list="matkulList" value="${esc(s.matkul === 'Belum Ada Mata Kuliah' ? '' : s.matkul)}" placeholder="Belum Ada Mata Kuliah (ketik untuk mengisi/mengubah)">
+          <button class="btn small" data-sact="addgrp" data-sid="${s.id}">➕ Kelompok</button>
           <button class="btn small" data-sact="copy" data-sid="${s.id}">Salin</button>
           <button class="btn small danger" data-sact="del" data-sid="${s.id}">Hapus</button>
         </div>
         <div class="nim">${s.groups.length} kelompok • Tanggal: ${fmtDate(s.date)}</div>
+        <datalist id="${dlId}">${availForSet.map(st => `<option value="${esc(labelOf(st))}">`).join('')}</datalist>
         <details open>
-          <summary>Edit nama kelompok, materi &amp; lihat anggota</summary>
+          <summary>✏️ Edit kelompok, materi &amp; pindah/tambah anggota</summary>
           ${s.groups.map((g, gi) => `
-            <div class="sgrp">
-              <input class="sgname" data-gi="${gi}" type="text" value="${esc(g.name)}" placeholder="Nama kelompok">
-              <input class="sgmateri" data-gi="${gi}" type="text" value="${esc(g.materi)}" placeholder="Materi kelompok">
-              <div class="smembers"><b>Anggota:</b> ${g.members.map((m, idx) => `${idx + 1}. ${esc(m)}`).join(' • ') || '-'}</div>
+            <div class="sgrp" data-gi="${gi}">
+              <div class="sgrp-head">
+                <input class="sgname" data-gi="${gi}" type="text" value="${esc(g.name)}" placeholder="Nama kelompok">
+                <input class="sgmateri" data-gi="${gi}" type="text" value="${esc(g.materi)}" placeholder="Materi kelompok">
+                <button class="btn small danger" data-sact="delgrp" data-sid="${s.id}" data-gi="${gi}" title="Hapus kelompok ini">Hapus</button>
+              </div>
+              <div class="smembers">
+                ${g.members.length ? g.members.map((m, mi) => `
+                  <div class="mrow">
+                    <span class="mname">${mi + 1}. ${esc(m)}</span>
+                    <select class="smv" data-gi="${gi}" data-mi="${mi}" title="Pindahkan ke kelompok lain">
+                      <option value="">↔ Pindah</option>
+                      ${s.groups.map((x, xi) => xi === gi ? '' : `<option value="${xi}">${esc(x.name)}</option>`).join('')}
+                    </select>
+                    <button class="xbtn" data-sact="rmmem" data-sid="${s.id}" data-gi="${gi}" data-mi="${mi}" title="Keluarkan anggota">×</button>
+                  </div>
+                `).join('') : '<div class="muted tiny">Belum ada anggota.</div>'}
+              </div>
+              <div class="addrow">
+                <input class="saddm" data-gi="${gi}" list="${dlId}" type="text" placeholder="Tambah anggota ke ${esc(g.name)}...">
+                <button class="btn small" data-sact="addmem" data-sid="${s.id}" data-gi="${gi}">Tambah</button>
+              </div>
             </div>`).join('')}
         </details>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
 }
 
 $('#filterSetMatkul').onchange = renderSavedGroups;
 
 $('#setsList').oninput = e => {
-  if (isMhs()) return;
+  if (!canEdit()) return;
   const box = e.target.closest('.setbox'); if (!box) return;
   const s = cloudState.savedGroups.find(x => x.id === box.dataset.sid); if (!s) return;
 
@@ -1918,9 +2323,41 @@ $('#setsList').oninput = e => {
   }
   const gi = e.target.dataset.gi;
   if (gi !== undefined) {
-    if (e.target.classList.contains('sgname')) s.groups[gi].name = e.target.value;
-    if (e.target.classList.contains('sgmateri')) s.groups[gi].materi = e.target.value;
-    pushToCloud();
+    if (e.target.classList.contains('sgname')) {
+      s.groups[gi].name = e.target.value;
+      pushToCloud();
+    } else if (e.target.classList.contains('sgmateri')) {
+      s.groups[gi].materi = e.target.value;
+      pushToCloud();
+    }
+  }
+};
+
+$('#setsList').onchange = e => {
+  if (!canEdit()) return;
+  if (!e.target.classList.contains('smv') || e.target.value === '') return;
+  const box = e.target.closest('.setbox'); if (!box) return;
+  const s = cloudState.savedGroups.find(x => x.id === box.dataset.sid); if (!s) return;
+  const gi = +e.target.dataset.gi;
+  const mi = +e.target.dataset.mi;
+  const to = +e.target.value;
+  const [who] = s.groups[gi].members.splice(mi, 1);
+  s.groups[to].members.push(who);
+  pushToCloud(true);
+  renderSavedGroups();
+  toast(`${who} dipindah ke ${s.groups[to].name} ✓`);
+};
+
+$('#setsList').onkeydown = e => {
+  if (!canEdit() || e.key !== 'Enter' || !e.target.classList.contains('saddm')) return;
+  e.preventDefault();
+  const box = e.target.closest('.setbox'); if (!box) return;
+  const s = cloudState.savedGroups.find(x => x.id === box.dataset.sid); if (!s) return;
+  const gi = +e.target.dataset.gi;
+  if (addMemberToList(s.groups, gi, e.target.value)) {
+    pushToCloud(true);
+    renderSavedGroups();
+    toast('Anggota ditambahkan ✓');
   }
 };
 
@@ -1928,13 +2365,48 @@ $('#setsList').onclick = e => {
   const act = e.target.dataset.sact; if (!act) return;
   const sid = e.target.dataset.sid;
   const s = cloudState.savedGroups.find(x => x.id === sid); if (!s) return;
+
   if (act === 'copy') copyText(buildGroupsText(s.groups, s.date, s.matkul));
-  if (act === 'del' && !isMhs()) {
+  if (!canEdit()) return;
+
+  if (act === 'del') {
     if (!confirm(`Hapus pembagian kelompok untuk "${s.matkul}"?`)) return;
     cloudState.savedGroups = cloudState.savedGroups.filter(x => x.id !== sid);
     pushToCloud(true);
     renderSavedGroups();
     refreshMatkulList();
+  }
+  if (act === 'addgrp') {
+    s.groups.push({ name: nextGroupName(s.groups), materi: '', members: [] });
+    pushToCloud(true);
+    renderSavedGroups();
+    toast('Kelompok baru ditambahkan ✓');
+  }
+  if (act === 'delgrp') {
+    const gi = +e.target.dataset.gi;
+    const g = s.groups[gi];
+    if (g.members.length && !confirm(`Hapus "${g.name}" beserta ${g.members.length} anggotanya?`)) return;
+    s.groups.splice(gi, 1);
+    pushToCloud(true);
+    renderSavedGroups();
+    toast('Kelompok dihapus');
+  }
+  if (act === 'rmmem') {
+    const gi = +e.target.dataset.gi;
+    const mi = +e.target.dataset.mi;
+    s.groups[gi].members.splice(mi, 1);
+    pushToCloud(true);
+    renderSavedGroups();
+    toast('Anggota dikeluarkan');
+  }
+  if (act === 'addmem') {
+    const gi = +e.target.dataset.gi;
+    const inp = e.target.parentElement.querySelector('.saddm');
+    if (addMemberToList(s.groups, gi, inp.value)) {
+      pushToCloud(true);
+      renderSavedGroups();
+      toast('Anggota ditambahkan ✓');
+    }
   }
 };
 
@@ -1951,6 +2423,7 @@ function resetJadwalForm() {
   $('#btnCancelJadwal').classList.add('hidden');
 }
 $('#btnSaveJadwal').onclick = () => {
+  if (!canEdit()) return;
   const matkul = $('#jMatkul').value.trim();
   if (!matkul) { toast('Nama mata kuliah wajib diisi'); return; }
   const data = { hari: $('#jHari').value, matkul, mulai: $('#jMulai').value, selesai: $('#jSelesai').value, dosen: $('#jDosen').value.trim() };
@@ -1973,15 +2446,16 @@ function renderJadwal() {
         <div class="item" data-jid="${j.id}">
           <div><span class="nm">${esc(j.matkul)}</span>
             <div class="nim">🕒 ${esc(jamText(j))} • 👨‍🏫 ${esc(j.dosen || '-')}</div></div>
-          <div class="row gap wrap">
-            <button class="btn small only-edit" data-jact="use">Pakai</button>
-            <button class="btn small only-edit" data-jact="edit">Edit</button>
-            <button class="btn small danger only-edit" data-jact="del">Hapus</button>
+          <div class="row gap wrap only-edit">
+            <button class="btn small" data-jact="use">Pakai</button>
+            <button class="btn small" data-jact="edit">Edit</button>
+            <button class="btn small danger" data-jact="del">Hapus</button>
           </div>
         </div>`).join('') + '</div>';
   }).join('');
 }
 $('#jadwalList').onclick = e => {
+  if (!canEdit()) return;
   const act = e.target.dataset.jact; if (!act) return;
   const id = e.target.closest('.item').dataset.jid;
   const j = cloudState.jadwal.find(x => x.id === id); if (!j) return;
@@ -2045,6 +2519,7 @@ function renderPending() {
 }
 
 $('#tFiles').onchange = async e => {
+  if (!canEdit()) return;
   for (const f of e.target.files) {
     if (!f.type.startsWith('image/')) { toast(`"${f.name}" harus berupa gambar`); continue; }
     try {
@@ -2057,6 +2532,7 @@ $('#tFiles').onchange = async e => {
   e.target.value = ''; renderPending();
 };
 $('#tPreview').onclick = e => {
+  if (!canEdit()) return;
   const i = e.target.dataset.rm; if (i === undefined) return;
   tForm.files.splice(i, 1); renderPending();
 };
@@ -2069,6 +2545,7 @@ function resetTugasForm() {
 $('#btnCancelTugas').onclick = resetTugasForm;
 
 $('#btnSaveTugas').onclick = () => {
+  if (!canEdit()) return;
   const judul = $('#tJudul').value.trim();
   if (!judul) { toast('Judul tugas wajib diisi'); return; }
   const data = {
@@ -2089,11 +2566,11 @@ $('#btnSaveTugas').onclick = () => {
   resetTugasForm(); renderTugas(); refreshMatkulList();
 };
 
-function deadlineChip(t) {
+function deadlineChip(t, isDoneForUser) {
   if (!t.deadline) return '';
   const days = Math.round((new Date(t.deadline + 'T00:00:00') - new Date(todayStr() + 'T00:00:00')) / 86400000);
   const tgl = fmtShort(t.deadline);
-  if (t.done) return `<span class="chip">⏰ ${tgl}</span>`;
+  if (isDoneForUser) return `<span class="chip">⏰ ${tgl}</span>`;
   if (days < 0) return `<span class="chip late">Terlewat ${-days} hari • ${tgl}</span>`;
   if (days === 0) return `<span class="chip warn">Hari ini • ${tgl}</span>`;
   if (days === 1) return `<span class="chip warn">Besok • ${tgl}</span>`;
@@ -2102,41 +2579,81 @@ function deadlineChip(t) {
 
 function renderTugas() {
   const allTugas = cloudState.tugas;
+  const mhsDoneMap = isMhs() ? getMhsDoneMap() : {};
+  const isTugasDone = t => isMhs() ? Boolean(t.done || mhsDoneMap[t.id]) : Boolean(t.done);
+
   const mats = [...new Set(allTugas.map(t => t.matkul || '(Tanpa mata kuliah)'))].sort();
   const cur = $('#tFilter').value || '';
   $('#tFilter').innerHTML = '<option value="">Semua mata kuliah</option>' + mats.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
   $('#tFilter').value = mats.includes(cur) ? cur : '';
-  const f = $('#tFilter').value, hide = $('#tHideDone').checked;
-  let list = allTugas.filter(t => (!f || (t.matkul || '(Tanpa mata kuliah)') === f) && !(hide && t.done));
-  list.sort((a, b) => (a.done - b.done) || ((a.deadline || '9999').localeCompare(b.deadline || '9999')) || (b.created - a.created));
+  const f = $('#tFilter').value;
+  const q = ($('#tSearch') ? $('#tSearch').value : '').trim().toLowerCase();
+  const hide = $('#tHideDone').checked;
+
+  let list = allTugas.filter(t => {
+    const matMatch = !f || (t.matkul || '(Tanpa mata kuliah)') === f;
+    const hideMatch = !(hide && isTugasDone(t));
+    const searchMatch = !q ||
+      (t.judul || '').toLowerCase().includes(q) ||
+      (t.desc || '').toLowerCase().includes(q) ||
+      (t.matkul || '').toLowerCase().includes(q);
+    return matMatch && hideMatch && searchMatch;
+  });
+  list.sort((a, b) => (isTugasDone(a) - isTugasDone(b)) || ((a.deadline || '9999').localeCompare(b.deadline || '9999')) || (b.created - a.created));
   $('#tCount').textContent = list.length;
-  $('#tugasList').innerHTML = list.length ? list.map(t => `
-    <div class="tcard ${t.done ? 'done' : ''}" data-tid="${t.id}">
+
+  $('#tugasList').innerHTML = list.length ? list.map(t => {
+    const doneGlobal = Boolean(t.done);
+    const donePersonal = Boolean(mhsDoneMap[t.id]);
+    const effectiveDone = isMhs() ? (doneGlobal || donePersonal) : doneGlobal;
+
+    return `
+    <div class="tcard ${effectiveDone ? 'done' : ''} ${isMhs() && effectiveDone ? 'mhs-checked' : ''}" data-tid="${t.id}">
       <div class="row between wrap gap">
         <h4>${esc(t.judul)}</h4>
         <div class="row gap wrap">
           ${t.matkul ? `<span class="chip">${esc(t.matkul)}</span>` : ''}
-          ${t.done ? '<span class="chip ok">✓ Selesai</span>' : ''}
-          ${deadlineChip(t)}
+          ${effectiveDone ? '<span class="chip ok">✓ Selesai</span>' : ''}
+          ${deadlineChip(t, effectiveDone)}
         </div>
       </div>
       ${t.desc ? `<div class="tdesc">${esc(t.desc)}</div>` : '<div class="muted tiny">Tidak ada penjelasan.</div>'}
       ${t.files && t.files.length ? `<div class="media-grid">${t.files.map(m =>
         `<img src="${m.dataUrl}" alt="${esc(m.name)}" title="${esc(m.name)}">`).join('')}</div>` : ''}
+      
+      <div class="only-mhs">
+        <label class="mhs-check-wrap ${effectiveDone ? 'checked' : ''}">
+          <input type="checkbox" class="mhs-tugas-chk" data-tid="${t.id}" ${effectiveDone ? 'checked' : ''} ${doneGlobal ? 'disabled' : ''}>
+          <span>${doneGlobal ? 'Ditutup / Selesai oleh Sekretaris' : (donePersonal ? 'Sudah Dikerjakan ✓ (klik untuk batalkan)' : 'Tandai Selesai')}</span>
+        </label>
+      </div>
+
       <div class="row gap wrap only-edit">
         <button class="btn small" data-tact="done">${t.done ? 'Tandai belum selesai' : 'Tandai selesai'}</button>
         <button class="btn small" data-tact="edit">Edit</button>
         <button class="btn small danger" data-tact="del">Hapus</button>
       </div>
-    </div>`).join('') : '<div class="empty">Belum ada tugas.</div>';
+    </div>`;
+  }).join('') : '<div class="empty">Belum ada tugas yang cocok.</div>';
 }
+$('#tSearch').oninput = renderTugas;
 $('#tFilter').onchange = renderTugas;
 $('#tHideDone').onchange = renderTugas;
+
+$('#tugasList').onchange = e => {
+  if (!e.target.classList.contains('mhs-tugas-chk')) return;
+  if (!isMhs()) return;
+  const tid = e.target.dataset.tid;
+  const nowChecked = toggleMhsTugasDone(tid);
+  renderTugas();
+  toast(nowChecked ? 'Tugas ditandai sudah selesai ✓' : 'Centang tugas dibatalkan');
+};
 
 $('#tugasList').onclick = e => {
   if (e.target.tagName === 'IMG') {
     $('#lightbox img').src = e.target.src; $('#lightbox').classList.remove('hidden'); return;
   }
+  if (!canEdit()) return;
   const act = e.target.dataset.tact; if (!act) return;
   const id = e.target.closest('.tcard').dataset.tid;
   const t = cloudState.tugas.find(x => x.id === id); if (!t) return;
@@ -2155,15 +2672,21 @@ $('#tugasList').onclick = e => {
 };
 $('#lightbox').onclick = () => $('#lightbox').classList.add('hidden');
 
-/* ================= RIWAYAT ABSENSI (RINGKASAN HASIL SAJA) ================= */
+/* ================= RIWAYAT ABSENSI & KELOMPOK (LENGKAP + EDIT LANGSUNG) ================= */
 $$('.subtab').forEach(b => b.onclick = () => {
   $$('.subtab').forEach(x => x.classList.toggle('active', x === b));
-  $('#histAbsen').classList.toggle('hidden', b.dataset.h !== 'absen');
-  $('#histKel').classList.toggle('hidden', b.dataset.h !== 'kel');
+  $('#histAbsenPane').classList.toggle('hidden', b.dataset.h !== 'absen');
+  $('#histKelPane').classList.toggle('hidden', b.dataset.h !== 'kel');
 });
+$('#histSearchAbsen').oninput = () => renderHistory();
+$('#histSearchKel').oninput = () => renderHistory();
 
 function renderHistory() {
-  const ka = Object.keys(cloudState.records).sort().reverse();
+  const qAbs = ($('#histSearchAbsen').value || '').trim().toLowerCase();
+  const qKel = ($('#histSearchKel').value || '').trim().toLowerCase();
+  const allKa = Object.keys(cloudState.records).sort().reverse();
+  const ka = allKa.filter(k => !qAbs || k === editingAbsenKey ||
+    (cloudState.records[k].matkul || '').toLowerCase().includes(qAbs));
   $('#histAbsen').innerHTML = ka.length ? ka.map(k => {
     const r = cloudState.records[k];
     const st = r.status || {};
@@ -2174,6 +2697,8 @@ function renderHistory() {
       ? `<ol class="hist-names">${arr.map(n => `<li>${esc(n)}</li>`).join('')}</ol>`
       : '<span class="muted tiny">Tidak ada</span>';
 
+    const isEditingThis = canEdit() && editingAbsenKey === k && editingAbsenDraft;
+
     return `
       <div class="hist-card">
         <div class="row between wrap gap">
@@ -2182,48 +2707,304 @@ function renderHistory() {
             <div class="nim">📅 ${fmtDate(r.date)}</div>
           </div>
           <div class="row gap wrap">
+            <button class="btn small only-sek" data-hact="edit-abs" data-k="${esc(k)}">${isEditingThis ? 'Tutup Edit' : '✏️ Edit'}</button>
             <button class="btn small" data-hact="copy-abs" data-k="${esc(k)}">Salin Rekap</button>
             <button class="btn small danger only-sek" data-hact="del-abs" data-k="${esc(k)}">Hapus</button>
           </div>
         </div>
-        <div class="hist-summary-grid">
-          <div class="hist-stat h"><b>✅ Hadir (${listH.length})</b>${renderGroupList(listH)}</div>
-          <div class="hist-stat i"><b>🔵 Izin (${listI.length})</b>${renderGroupList(listI)}</div>
-          <div class="hist-stat s"><b>🟡 Sakit (${listS.length})</b>${renderGroupList(listS)}</div>
-          <div class="hist-stat a"><b>🔴 Alpha (${listA.length})</b>${renderGroupList(listA)}</div>
-        </div>
-        ${r.note ? `<div class="tiny muted">📝 <b>Catatan:</b> ${esc(r.note)}</div>` : ''}
+        ${isEditingThis ? `
+          <div class="hist-edit-panel">
+            <b>✏️ Edit Riwayat Absensi</b>
+            <div class="grid2">
+              <div class="field">
+                <label>Mata Kuliah</label>
+                <input type="text" id="editAbsMatkul" list="matkulList" value="${esc(editingAbsenDraft.matkul)}">
+              </div>
+              <div class="field">
+                <label>Tanggal</label>
+                <input type="date" id="editAbsDate" value="${esc(editingAbsenDraft.date)}">
+              </div>
+            </div>
+            <div class="list">
+              ${cloudState.students.map((s, idx) => `
+                <div class="hist-edit-row">
+                  <div><b>${idx + 1}. ${esc(s.name)}</b>${s.nim ? `<div class="nim">${esc(s.nim)}</div>` : ''}</div>
+                  <div class="st" data-edit-sid="${s.id}">
+                    ${Object.keys(STATUS).map(code => `<button type="button" data-s="${code}" class="${editingAbsenDraft.status[s.id] === code ? 'on' : ''}">${code}</button>`).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="field">
+              <label>Catatan</label>
+              <input type="text" id="editAbsNote" value="${esc(editingAbsenDraft.note || '')}" placeholder="Catatan pertemuan...">
+            </div>
+            <div class="row gap wrap">
+              <button class="btn primary small" data-hact="save-abs" data-k="${esc(k)}">💾 Simpan Perubahan</button>
+              <button class="btn small" data-hact="cancel-abs">Batal</button>
+            </div>
+          </div>
+        ` : `
+          <div class="hist-summary-grid">
+            <div class="hist-stat h"><b>✅ Hadir (${listH.length})</b>${renderGroupList(listH)}</div>
+            <div class="hist-stat i"><b>🔵 Izin (${listI.length})</b>${renderGroupList(listI)}</div>
+            <div class="hist-stat s"><b>🟡 Sakit (${listS.length})</b>${renderGroupList(listS)}</div>
+            <div class="hist-stat a"><b>🔴 Alpha (${listA.length})</b>${renderGroupList(listA)}</div>
+          </div>
+          ${r.note ? `<div class="tiny muted">📝 <b>Catatan:</b> ${esc(r.note)}</div>` : ''}
+        `}
       </div>`;
-  }).join('') : '<div class="empty">Belum ada riwayat absensi tersimpan.</div>';
+  }).join('') : `<div class="empty">${allKa.length ? 'Tidak ada riwayat absensi yang cocok dengan pencarian.' : 'Belum ada riwayat absensi tersimpan.'}</div>`;
 
-  const kk = cloudState.savedGroups || [];
+  const allKk = cloudState.savedGroups || [];
+  const kk = allKk.filter(g => !qKel || g.id === editingKelId ||
+    (g.matkul || 'Belum Ada Mata Kuliah').toLowerCase().includes(qKel));
   $('#histKel').innerHTML = kk.length ? kk.map(g => {
-    const names = g.groups.map(x => esc(x.name) + (x.materi ? ` (${esc(x.materi)})` : '')).join(' • ');
-    return `<div class="item">
-      <div><span class="nm">${esc(g.matkul)}</span>
-        <div class="nim">${fmtDate(g.date)}</div>
-        <div class="nim">${g.groups.length} kelompok: ${names}</div></div>
-      <div class="row gap wrap">
-        <button class="btn small" data-hact="copy-kel" data-id="${esc(g.id)}">Salin Kelompok</button>
-        <button class="btn small danger only-sek" data-hact="del-kel" data-id="${esc(g.id)}">Hapus</button>
-      </div></div>`;
-  }).join('') : '<div class="empty">Belum ada riwayat kelompok.</div>';
+    const isEditingThis = canEdit() && editingKelId === g.id && editingKelDraft;
+    const usedSet = isEditingThis ? new Set(editingKelDraft.groups.flatMap(grp => grp.members.map(m => m.toLowerCase()))) : null;
+    const availForEdit = isEditingThis ? allNames().filter(st => !usedSet.has(labelOf(st).toLowerCase())) : [];
+    const dlId = `dl-hist-${g.id}`;
+
+    return `
+      <div class="hist-card">
+        <div class="row between wrap gap">
+          <div>
+            <span class="nm" style="font-size:1.05rem">📘 ${esc(g.matkul || 'Belum Ada Mata Kuliah')}</span>
+            <div class="nim">📅 ${fmtDate(g.date)} • ${g.groups.length} kelompok</div>
+          </div>
+          <div class="row gap wrap">
+            <button class="btn small only-sek" data-hact="edit-kel" data-id="${esc(g.id)}">${isEditingThis ? 'Tutup Edit' : '✏️ Edit'}</button>
+            <button class="btn small" data-hact="copy-kel" data-id="${esc(g.id)}">Salin Kelompok</button>
+            <button class="btn small danger only-sek" data-hact="del-kel" data-id="${esc(g.id)}">Hapus</button>
+          </div>
+        </div>
+
+        ${isEditingThis ? `
+          <div class="hist-edit-panel">
+            <b>✏️ Edit Riwayat Kelompok</b>
+            <div class="grid2">
+              <div class="field">
+                <label>Mata Kuliah</label>
+                <input type="text" id="editKelMatkul" list="matkulList" value="${esc(editingKelDraft.matkul === 'Belum Ada Mata Kuliah' ? '' : editingKelDraft.matkul)}" placeholder="Nama mata kuliah">
+              </div>
+              <div class="field">
+                <label>Tanggal</label>
+                <input type="date" id="editKelDate" value="${esc(editingKelDraft.date || todayStr())}">
+              </div>
+            </div>
+            <datalist id="${dlId}">${availForEdit.map(st => `<option value="${esc(labelOf(st))}">`).join('')}</datalist>
+            <div class="row gap wrap">
+              <button class="btn small" data-hact="kel-addgrp">➕ Tambah Kelompok</button>
+            </div>
+            ${editingKelDraft.groups.map((grp, gi) => `
+              <div class="sgrp">
+                <div class="sgrp-head">
+                  <input class="hkel-gname" data-gi="${gi}" type="text" value="${esc(grp.name)}" placeholder="Nama kelompok">
+                  <input class="hkel-gmateri" data-gi="${gi}" type="text" value="${esc(grp.materi)}" placeholder="Materi kelompok">
+                  <button class="btn small danger" data-hact="kel-delgrp" data-gi="${gi}">Hapus</button>
+                </div>
+                <div class="smembers">
+                  ${grp.members.length ? grp.members.map((m, mi) => `
+                    <div class="mrow">
+                      <span class="mname">${mi + 1}. ${esc(m)}</span>
+                      <select class="hkel-mv" data-gi="${gi}" data-mi="${mi}" title="Pindahkan ke kelompok lain">
+                        <option value="">↔ Pindah</option>
+                        ${editingKelDraft.groups.map((x, xi) => xi === gi ? '' : `<option value="${xi}">${esc(x.name)}</option>`).join('')}
+                      </select>
+                      <button class="xbtn" data-hact="kel-rmmem" data-gi="${gi}" data-mi="${mi}" title="Keluarkan">×</button>
+                    </div>
+                  `).join('') : '<div class="muted tiny">Belum ada anggota.</div>'}
+                </div>
+                <div class="addrow">
+                  <input class="hkel-addm" data-gi="${gi}" list="${dlId}" type="text" placeholder="Tambah anggota ke ${esc(grp.name)}...">
+                  <button class="btn small" data-hact="kel-addmem" data-gi="${gi}">Tambah</button>
+                </div>
+              </div>
+            `).join('')}
+            <div class="row gap wrap">
+              <button class="btn primary small" data-hact="save-kel" data-id="${esc(g.id)}">💾 Simpan Perubahan</button>
+              <button class="btn small" data-hact="cancel-kel">Batal</button>
+            </div>
+          </div>
+        ` : `
+          <div class="mhs-grp-grid">
+            ${g.groups.map(grp => `
+              <div class="mhs-grp-box">
+                <h5>${esc(grp.name)}</h5>
+                ${grp.materi ? `<div class="materi-tag">Materi: ${esc(grp.materi)}</div>` : ''}
+                ${grp.members.length
+                  ? `<ol>${grp.members.map(m => `<li>${esc(m)}</li>`).join('')}</ol>`
+                  : '<div class="muted tiny">Belum ada anggota</div>'}
+              </div>
+            `).join('')}
+          </div>
+        `}
+      </div>`;
+  }).join('') : `<div class="empty">${allKk.length ? 'Tidak ada riwayat kelompok yang cocok dengan pencarian.' : 'Belum ada riwayat kelompok.'}</div>`;
 }
 
+$('#tab-riwayat').oninput = e => {
+  if (!canEdit()) return;
+  if (editingAbsenDraft) {
+    if (e.target.id === 'editAbsMatkul') editingAbsenDraft.matkul = e.target.value;
+    if (e.target.id === 'editAbsDate') editingAbsenDraft.date = e.target.value;
+    if (e.target.id === 'editAbsNote') editingAbsenDraft.note = e.target.value;
+  }
+  if (editingKelDraft) {
+    if (e.target.id === 'editKelMatkul') editingKelDraft.matkul = e.target.value;
+    if (e.target.id === 'editKelDate') editingKelDraft.date = e.target.value;
+    const gi = e.target.dataset.gi;
+    if (gi !== undefined) {
+      if (e.target.classList.contains('hkel-gname')) editingKelDraft.groups[+gi].name = e.target.value;
+      if (e.target.classList.contains('hkel-gmateri')) editingKelDraft.groups[+gi].materi = e.target.value;
+    }
+  }
+};
+
+$('#tab-riwayat').onchange = e => {
+  if (!canEdit() || !editingKelDraft) return;
+  if (e.target.classList.contains('hkel-mv') && e.target.value !== '') {
+    const gi = +e.target.dataset.gi;
+    const mi = +e.target.dataset.mi;
+    const to = +e.target.value;
+    const [who] = editingKelDraft.groups[gi].members.splice(mi, 1);
+    editingKelDraft.groups[to].members.push(who);
+    renderHistory();
+  }
+};
+
+$('#tab-riwayat').onkeydown = e => {
+  if (!canEdit() || !editingKelDraft) return;
+  if (e.key === 'Enter' && e.target.classList.contains('hkel-addm')) {
+    e.preventDefault();
+    const gi = +e.target.dataset.gi;
+    if (addMemberToList(editingKelDraft.groups, gi, e.target.value)) {
+      renderHistory();
+    }
+  }
+};
+
 $('#tab-riwayat').onclick = e => {
+  const stBtn = e.target.closest('[data-edit-sid] button[data-s]');
+  if (stBtn && canEdit() && editingAbsenDraft) {
+    const sid = stBtn.parentElement.dataset.editSid;
+    editingAbsenDraft.status[sid] = stBtn.dataset.s;
+    renderHistory();
+    return;
+  }
+
   const act = e.target.dataset.hact; if (!act) return;
   const k = e.target.dataset.k;
   const id = e.target.dataset.id;
 
-  if (act === 'copy-abs') { const r = cloudState.records[k]; if (r) copyText(buildRekapFrom(r)); }
-  if (act === 'copy-kel') { const g = cloudState.savedGroups.find(x => x.id === id); if (g) copyText(buildGroupsText(g.groups, g.date, g.matkul)); }
-  if (act === 'del-abs' && !isMhs() && confirm('Hapus riwayat absensi pertemuan ini?')) {
+  if (act === 'copy-abs') { const r = cloudState.records[k]; if (r) copyText(buildRekapFrom(r)); return; }
+  if (act === 'copy-kel') { const g = cloudState.savedGroups.find(x => x.id === id); if (g) copyText(buildGroupsText(g.groups, g.date, g.matkul)); return; }
+
+  if (!canEdit()) return;
+
+  // === EDIT RIWAYAT ABSEN ===
+  if (act === 'edit-abs') {
+    if (editingAbsenKey === k) {
+      editingAbsenKey = null; editingAbsenDraft = null;
+    } else {
+      const r = cloudState.records[k]; if (!r) return;
+      editingAbsenKey = k;
+      editingAbsenDraft = {
+        date: r.date,
+        matkul: r.matkul,
+        status: { ...(r.status || {}) },
+        note: r.note || ''
+      };
+    }
+    renderHistory();
+  }
+  if (act === 'cancel-abs') {
+    editingAbsenKey = null; editingAbsenDraft = null;
+    renderHistory();
+  }
+  if (act === 'save-abs') {
+    if (!editingAbsenDraft) return;
+    const newMatkul = (editingAbsenDraft.matkul || '').trim();
+    const newDate = editingAbsenDraft.date;
+    if (!newMatkul) { toast('Mata kuliah wajib diisi'); return; }
+    if (!newDate) { toast('Tanggal wajib diisi'); return; }
+
+    const newKey = ctxKey(newDate, newMatkul);
+    if (newKey !== k) delete cloudState.records[k];
+    cloudState.records[newKey] = {
+      date: newDate,
+      matkul: newMatkul,
+      status: { ...editingAbsenDraft.status },
+      note: editingAbsenDraft.note || ''
+    };
+    editingAbsenKey = null; editingAbsenDraft = null;
+    pushToCloud(true);
+    refreshMatkulList();
+    loadContext();
+    renderHistory();
+    toast('Perubahan riwayat absen disimpan ✓');
+  }
+  if (act === 'del-abs' && confirm('Hapus riwayat absensi pertemuan ini?')) {
     delete cloudState.records[k];
+    if (editingAbsenKey === k) { editingAbsenKey = null; editingAbsenDraft = null; }
     pushToCloud(true);
     renderHistory(); loadContext(); refreshMatkulList();
   }
-  if (act === 'del-kel' && !isMhs() && confirm('Hapus riwayat kelompok ini?')) {
+
+  // === EDIT RIWAYAT KELOMPOK ===
+  if (act === 'edit-kel') {
+    if (editingKelId === id) {
+      editingKelId = null; editingKelDraft = null;
+    } else {
+      const g = cloudState.savedGroups.find(x => x.id === id); if (!g) return;
+      editingKelId = id;
+      editingKelDraft = JSON.parse(JSON.stringify(g));
+    }
+    renderHistory();
+  }
+  if (act === 'cancel-kel') {
+    editingKelId = null; editingKelDraft = null;
+    renderHistory();
+  }
+  if (act === 'kel-addgrp' && editingKelDraft) {
+    editingKelDraft.groups.push({ name: nextGroupName(editingKelDraft.groups), materi: '', members: [] });
+    renderHistory();
+  }
+  if (act === 'kel-delgrp' && editingKelDraft) {
+    const gi = +e.target.dataset.gi;
+    editingKelDraft.groups.splice(gi, 1);
+    renderHistory();
+  }
+  if (act === 'kel-rmmem' && editingKelDraft) {
+    const gi = +e.target.dataset.gi;
+    const mi = +e.target.dataset.mi;
+    editingKelDraft.groups[gi].members.splice(mi, 1);
+    renderHistory();
+  }
+  if (act === 'kel-addmem' && editingKelDraft) {
+    const gi = +e.target.dataset.gi;
+    const inp = e.target.parentElement.querySelector('.hkel-addm');
+    if (addMemberToList(editingKelDraft.groups, gi, inp.value)) {
+      renderHistory();
+    }
+  }
+  if (act === 'save-kel' && editingKelDraft) {
+    const target = cloudState.savedGroups.find(x => x.id === id);
+    if (target) {
+      target.matkul = (editingKelDraft.matkul || '').trim() || 'Belum Ada Mata Kuliah';
+      target.date = editingKelDraft.date || target.date;
+      target.groups = editingKelDraft.groups;
+    }
+    editingKelId = null; editingKelDraft = null;
+    pushToCloud(true);
+    refreshMatkulList();
+    renderSavedGroups();
+    renderHistory();
+    toast('Perubahan riwayat kelompok disimpan ✓');
+  }
+  if (act === 'del-kel' && confirm('Hapus riwayat kelompok ini?')) {
     cloudState.savedGroups = cloudState.savedGroups.filter(x => x.id !== id);
+    if (editingKelId === id) { editingKelId = null; editingKelDraft = null; }
     pushToCloud(true);
     renderHistory(); renderSavedGroups(); refreshMatkulList();
   }
@@ -2231,6 +3012,7 @@ $('#tab-riwayat').onclick = e => {
 
 /* ================= PENGATURAN: GANTI SANDI ================= */
 $('#btnChangeCode').onclick = () => {
+  if (!canEdit()) return;
   const o = $('#codeOld').value, n = $('#codeNew').value, n2 = $('#codeNew2').value, msg = $('#codeMsg');
   msg.className = 'form-err';
   if (o !== getCode()) { msg.textContent = 'Sandi lama salah.'; return; }
@@ -2254,7 +3036,7 @@ async function initApp() {
     inited = true;
   }
   await pullFromCloud(false);
-  refreshAllViews();
+  refreshAllViews(true);
 }
 applySession();
 </script>
